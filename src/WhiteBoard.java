@@ -10,8 +10,9 @@ public class WhiteBoard extends JFrame implements ModelListener{
 	
 	private Canvas canvas;
 	
+	
 	 public WhiteBoard() {
-	  
+		 	
 	        showWhiteBoardGUI();
 	    }
 	    
@@ -20,12 +21,14 @@ public class WhiteBoard extends JFrame implements ModelListener{
 	private void showWhiteBoardGUI() {
 		//whole whiteboard gui + canvas
 			Canvas canvas = new Canvas();
+			ControlGui controlGui = new ControlGui(canvas.getTableModel());
 			this.canvas = canvas;
+			
 			JFrame frame = new JFrame("WhiteBoard");
 			frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 			frame.setLayout(new BorderLayout());
 			frame.add(canvas, BorderLayout.CENTER);
-	        //theFrame.add(showControllerGUI(), BorderLayout.WEST);
+			frame.add(controlGui, BorderLayout.WEST);
 			frame.setVisible(true);
 			frame.pack();
 	}
@@ -50,5 +53,5 @@ public class WhiteBoard extends JFrame implements ModelListener{
 		//as model changed repaint components
 		repaint();
 	}
-
+	 
 }

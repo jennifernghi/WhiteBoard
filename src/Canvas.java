@@ -5,14 +5,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 public class Canvas extends JPanel{
 	final static int CANVAS_SIZE = 400;
 	private List<DShape> shapes = new ArrayList<DShape>();
-	
+	private TableModel tableModel;
+	 
 	public Canvas() {
 		showCanvasGUI();
 	}
+	
+	public TableModel getTableModel() {
+        return tableModel;
+    }
 	public List<DShape> getShapes() {
         return this.shapes;
     }
