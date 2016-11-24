@@ -21,13 +21,13 @@ public class WhiteBoard extends JFrame implements ModelListener{
 		//whole whiteboard gui + canvas
 			Canvas canvas = new Canvas();
 			this.canvas = canvas;
-			JFrame theFrame = new JFrame("WhiteBoard");
-	        theFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-	        theFrame.setLayout(new BorderLayout());
-	        theFrame.add(canvas, BorderLayout.CENTER);
+			JFrame frame = new JFrame("WhiteBoard");
+			frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+			frame.setLayout(new BorderLayout());
+			frame.add(canvas, BorderLayout.CENTER);
 	        //theFrame.add(showControllerGUI(), BorderLayout.WEST);
-	        theFrame.setVisible(true);
-	        theFrame.pack();
+			frame.setVisible(true);
+			frame.pack();
 	}
 
 
