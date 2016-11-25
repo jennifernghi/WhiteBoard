@@ -164,6 +164,7 @@ public class ControlGui extends JPanel{
 		
 	}
 	private void showTableGUI(TableModel model) {
+		
 		table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         this.add(scrollPane);
