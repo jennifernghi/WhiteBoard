@@ -52,4 +52,3 @@ public class WhiteBoard extends JFrame implements ModelListener{
 	 
 }
 
-//for testing purposes
