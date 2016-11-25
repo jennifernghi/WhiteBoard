@@ -21,7 +21,7 @@ public class WhiteBoard extends JFrame implements ModelListener{
 	private void showWhiteBoardGUI() {
 		//whole whiteboard gui + canvas
 			Canvas canvas = new Canvas();
-			ControlGui controlGui = new ControlGui(canvas.getTableModel());
+			ControlGui controlGui = new ControlGui(canvas,canvas.getTableModel());
 			this.canvas = canvas;
 			
 			JFrame frame = new JFrame("WhiteBoard");
@@ -34,10 +34,6 @@ public class WhiteBoard extends JFrame implements ModelListener{
 	}
 
 
-
-	private Component showControllerGUI() {
-		return null;
-	}
 
 
 

@@ -6,4 +6,12 @@ public abstract class DShape {
 	 public void draw(Graphics g) {
 		 
 	}
+	 
+	public DShapeModel getdShapeModel() {
+		return this.dShapeModel;
+	}
+	
+	public void setdShapeModel(DShapeModel dShapeModel) {
+		this.dShapeModel = dShapeModel;
+	}
 }

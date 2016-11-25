@@ -16,24 +16,24 @@ import javax.swing.table.TableModel;
 
 public class ControlGui extends JPanel{
 	//JPanel box = new JPanel();
-	JPanel networkPanel = new JPanel();
-	JPanel fileControlPanel = new JPanel();
-	JPanel addShapesPanel = new JPanel();
-	JPanel setColorPanel = new JPanel();
-	JPanel editTextPanel = new JPanel();
-	JPanel editShapePanel = new JPanel();
-	JButton serverStartButton, clientStartButton, saveButton, openButton, 
+	private JPanel networkPanel = new JPanel();
+	private JPanel fileControlPanel = new JPanel();
+	private JPanel addShapesPanel = new JPanel();
+	private JPanel setColorPanel = new JPanel();
+	private JPanel editTextPanel = new JPanel();
+	private JPanel editShapePanel = new JPanel();
+	private JButton serverStartButton, clientStartButton, saveButton, openButton, 
 		saveImageButton, addRectButton, addOvalButton,addLineButton,addTextButton, setColorButton, moveFrontButton, moveBackButton, removeShapeButton;
-	JLabel networkStatus;
-	JColorChooser colorChooser = new JColorChooser();
-	JComboBox<String> fontChooser;
-	JTextField textField;
-	Canvas canvas;
-	JTable table; 
+	private JLabel networkStatus;
+	private JColorChooser colorChooser = new JColorChooser();
+	private JComboBox<String> fontChooser;
+	private JTextField textField;
+	private Canvas canvas;
+	private JTable table; 
 	
 	
-	public  ControlGui(TableModel model) {
-		
+	public  ControlGui(Canvas canvas, TableModel model) {
+		this.canvas = canvas;
 		showControlGUI(model);
 	}
 
@@ -41,11 +41,11 @@ public class ControlGui extends JPanel{
 		 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		 this.setAlignmentX(LEFT_ALIGNMENT);
 		
-		showNetWorkControl();
-		showFileControl();
+		 showNetWorkPanel();
+		 showFilePanel();
 		showAddShapesControl();
 		showSetColorGui();
-		showEditTextGUI();
+		showEditTextPanel();
 		showEditShapePanel();
 		showTableGUI(model);
 		
@@ -88,7 +88,7 @@ public class ControlGui extends JPanel{
 		
 	}
 
-	private void showEditTextGUI() {
+	private void showEditTextPanel() {
 		
          textField = new JTextField("whiteboard!");
          String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames(); 
@@ -132,7 +132,7 @@ public class ControlGui extends JPanel{
 		
 	}
 
-	private void showNetWorkControl() {
+	private void showNetWorkPanel() {
 
         
         networkStatus = new JLabel("Status:");
@@ -147,7 +147,7 @@ public class ControlGui extends JPanel{
         add(networkPanel);
 		
 	}
-	private void showFileControl() {
+	private void showFilePanel() {
 		
 		
 		saveButton = new JButton("Save");
@@ -221,13 +221,19 @@ public class ControlGui extends JPanel{
 	 * handle add oval
 	 */
 	private void addOval() {
-		
+		 DOval oval = new DOval();
+	        
+         canvas.addShapeToList(oval);
+         canvas.updateTable(oval);
 	}
 	/**
 	 * handle add rect
 	 */
 	private void addRect() {
-		
+		 DRect rect = new DRect();
+        
+         canvas.addShapeToList(rect);
+         canvas.updateTable(rect);
 	}
 
 	/**

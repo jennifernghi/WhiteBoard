@@ -4,10 +4,17 @@ public class DText extends DShape {
 	 private DTextModel dTextModel;
 	    
 	    public DText() {
-	        
+	    	this.dTextModel = new DTextModel();
+			 super.setdShapeModel(this.dTextModel);
+		     defaultDText();
 	    }
 	    
-	    @Override
+	    private void defaultDText() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
 		public void draw(Graphics g){
 	      
 		}

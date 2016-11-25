@@ -16,7 +16,8 @@ import javax.swing.table.TableModel;
 public class Canvas extends JPanel{
 	final static int CANVAS_SIZE = 400;
 	private List<DShape> shapes = new ArrayList<DShape>();
-	private DefaultTableModel tableModel;
+	private DefaultTableModel table;
+	private Integer[] columnsData = new Integer[4]; //4 columns
 	 
 	public Canvas() {
 		showCanvasGUI();
@@ -24,6 +25,10 @@ public class Canvas extends JPanel{
 		initializeMouseEvent();
 	}
 	
+	public void addShapeToList(DShape shape) {
+		shapes.add(shape);
+		repaint();
+	}
 	private void initializeMouseEvent() {
 		this.addMouseListener(new MouseAdapter() {
 			
@@ -55,16 +60,16 @@ public class Canvas extends JPanel{
 	}
 
 	private void initializeTable() {
-		tableModel = new DefaultTableModel();
-		 tableModel.addColumn("X");
-		 tableModel.addColumn("Y");
-		 tableModel.addColumn("Width");
-		 tableModel.addColumn("Height");
+		table = new DefaultTableModel();
+		 table.addColumn("X");
+		 table.addColumn("Y");
+		 table.addColumn("Width");
+		 table.addColumn("Height");
 		
 	}
 
 	public TableModel getTableModel() {
-        return tableModel;
+        return table;
     }
 	public List<DShape> getShapes() {
         return this.shapes;
@@ -91,6 +96,15 @@ public class Canvas extends JPanel{
 	 * @param shape
 	 */
 	public void addShape(DShapeModel dShapeModel) {
-      
+		 
     }
+	
+	protected void updateTable(DShape shape){
+		 columnsData[0] = shape.getdShapeModel().getX();
+		 columnsData[1] = shape.getdShapeModel().getY();
+		 columnsData[2] = shape.getdShapeModel().getHeight();
+		 columnsData[3] = shape.getdShapeModel().getWidth();
+
+	        table.addRow(columnsData);
+	}
 }
