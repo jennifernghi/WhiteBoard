@@ -2,7 +2,7 @@
 public class DLineModel extends DShapeModel {
 	/**
 	 * DLineModel gets X and Y from DShapeModel
-	 * a line contains 2 points (x, y) and (x2, y2)
+	 * a line contains 2 points  p1(x, y) and p2(x2, y2)
 	 */
 	private int x2;
 	private int y2;
