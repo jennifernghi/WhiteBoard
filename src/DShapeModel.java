@@ -65,5 +65,6 @@ public abstract class DShapeModel {
 
 	public void setModelListeners(List<ModelListener> listeners) {
 		this.listeners = listeners;
+	
 	}
 }
