@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.util.List;
+import java.awt.Rectangle;
 
 
 public abstract class DShapeModel {
@@ -66,5 +67,9 @@ public abstract class DShapeModel {
 	public void setModelListeners(List<ModelListener> listeners) {
 		this.listeners = listeners;
 	
+	}
+
+	public Rectangle getBounds(){
+		return new Rectangle(getX(), getY(), getWidth(), getHeight());
 	}
 }
