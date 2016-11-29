@@ -1,9 +1,11 @@
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public abstract class DShape {
 	boolean selected;
 	private DShapeModel dShapeModel;
-	 public void draw(Graphics g) {
+	 
+	public void draw(Graphics g) {
 		 
 	}
 	 
@@ -13,5 +15,11 @@ public abstract class DShape {
 	
 	public void setdShapeModel(DShapeModel dShapeModel) {
 		this.dShapeModel = dShapeModel;
+	}
+
+	//TODO getBounds
+
+	public Rectangle getBounds(){
+		return dShapeModel.getBounds();
 	}
 }
