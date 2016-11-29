@@ -5,24 +5,29 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
+import java.awt.Rectangle;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.JTextField;
 
 public class Canvas extends JPanel{
 	final static int CANVAS_SIZE = 400;
 	private List<DShape> shapes = new ArrayList<DShape>();
 	private DefaultTableModel table;
 	private Integer[] columnsData = new Integer[4]; //4 columns
-	 
+	private DShape selected ;
+	private JTextField cursor;  //pointer of the selected shape on Canvas
+
 	public Canvas() {
 		showCanvasGUI();
 		initializeTable();
 		initializeMouseEvent();
+		//System.out.println("hi this is happening");
 	}
 	
 	public void addShapeToList(DShape shape) {
@@ -35,8 +40,38 @@ public class Canvas extends JPanel{
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+				// TODO call getBound and get rect boundary. ask if it is a shape 
+				//loop through the shapes and see if the rect contains this point
+				//if yes then put x on it and assign selected to the shape; if not keep looping
+				//if at the end all is not within bound, then quit
+				//System.out.println("hi this is happening");
+
+				int x = e.getX();
+				int y = e.getY();
+
+				for (DShape shape: shapes){
+					Rectangle bound = shape.getBounds();
+
+					if (bound.contains(x, y)){
+						//System.out.println("hi this works");
+						if (cursor == null){
+						cursor = new JTextField("x"); 
+						cursor.setBounds(x, y, 10,10);
+						//cursor.setColor(new Color(0,0,0,0));
+						cursor.setOpaque(false);  
+						cursor.setBorder(null); 
+						add(cursor);
+						}
+						else{
+							cursor.setBounds(x,y, 10,10);
+							add(cursor);
+						}
+
+						selected = shape; 
+						
+					}
+				}
+
 			}
 			
 		});
