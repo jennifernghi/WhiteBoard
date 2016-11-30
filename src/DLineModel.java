@@ -53,7 +53,7 @@ public class DLineModel extends DShapeModel {
 	 * @param x given X
 	 */
 	public void setX(int x) {
-		int newX = x;
+		int newX = x - super.getX();
 		p1.x += newX;
 		p2.x += newX;
 		setBound();
@@ -65,7 +65,7 @@ public class DLineModel extends DShapeModel {
 	 * @param y given Y
 	 */
 	public void setY(int y) {
-		int newY = y;
+		int newY = y - super.getY();
 		p1.y += newY;
 		p2.y += newY;
 		setBound();
