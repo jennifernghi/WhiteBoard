@@ -1,75 +1,143 @@
 import java.awt.Color;
-import java.util.List;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 
 public abstract class DShapeModel {
-	private int x;
-	private int y;
-	private int width;
-	private int height;
+	
+	//the rectangle "conceptual" bound of the shape
+	private Rectangle conceptualBound; 
+	private Point anchorPoint; //used for resizing, this point(s) not moving while resizing
 	private Color color;
-	private List<ModelListener> listeners;
+	private ArrayList<ModelListener> listeners = new ArrayList<>();
 
 	public DShapeModel() {
-
-		this.x = 0;
-		this.y = 0;
-		this.width = 0;
-		this.height = 0;
+		conceptualBound = new Rectangle(0, 0, 0, 0);
 		this.color = Color.GRAY;
 	}
-
+	/*
+	 * set X of conceptual bound
+	 * @param x int
+	 */
 	public void setX(int x) {
-		this.x = x;
+		this.conceptualBound.x = x;
+		notifyModelChanged();//notify this shape model has changed
 	}
-
+	/**
+	 * get x of conceptual bound
+	 * @return x
+	 */
 	public int getX() {
-		return x;
+		return this.conceptualBound.x;
 	}
-
+	/*
+	 * set Y of conceptual bound
+	 * @param y int
+	 */
 	public void setY(int y) {
-		this.y = y;
+		this.conceptualBound.y = y;
+		notifyModelChanged();//notify this shape model has changed
 	}
-
+	
+	/**
+	 * get y of conceptual bound
+	 * @return y
+	 */
 	public int getY() {
-		return y;
+		return conceptualBound.y;
 	}
-
+	/*
+	 * set width of conceptual bound
+	 * @param width int
+	 */
 	public void setWidth(int width) {
-		this.width = width;
+		this.conceptualBound.width = width;
+		notifyModelChanged();//notify this shape model has changed
 	}
-
+	/**
+	 * get width of conceptual bound
+	 * @return width
+	 */
 	public int getWidth() {
-		return width;
+		return this.conceptualBound.width;
 	}
-
+	/*
+	 * set height of conceptual bound
+	 * @param height int
+	 */
 	public void setHeight(int height) {
-		this.height = height;
+		this.conceptualBound.height = height;
+		notifyModelChanged();//notify this shape model has changed
 	}
-
+	/**
+	 * get height of conceptual bound
+	 * @return height
+	 */
 	public int getHeight() {
-		return height;
+		return this.conceptualBound.height;
 	}
-
+	/**
+	 * setColor
+	 * @param color
+	 */
 	public void setColor(Color color) {
 		this.color = color;
+		notifyModelChanged();//notify this shape model has changed
 	}
-
+	/**
+	 * get color
+	 * @return color
+	 */
 	public Color getColor() {
 		return color;
 	}
 
-	public List<ModelListener> getListeners() {
-		return listeners;
-	}
-
-	public void setModelListeners(List<ModelListener> listeners) {
-		this.listeners = listeners;
 	
+	/**
+	 * add listeners
+	 * @param listener
+	 */
+	public void addModelListener(ModelListener listener) {
+		this.listeners.add(listener);
 	}
-
-	public Rectangle getBounds(){
+	/**
+	 * remove listeners
+	 * @param listener
+	 */
+	public void removeModelListener(ModelListener listener) {
+		this.listeners.remove(listener);
+	}
+	/**
+	 * when this model change, loop through listeners
+	 * send modelChanged()
+	 */
+	public void notifyModelChanged() {
+		for(ModelListener modelListener: listeners){
+			modelListener.modelChanged(this);
+		}
+	}
+	/**
+	 * get the conceptual bound
+	 */
+	public void setBound(Rectangle conceptualBound) {
+		this.conceptualBound= conceptualBound;
+		notifyModelChanged();
+	}
+	
+	public Rectangle getBound() {
+		return this.conceptualBound;
+	}
+	/*public Rectangle getBounds(){
 		return new Rectangle(getX(), getY(), getWidth(), getHeight());
+	}*/
+	
+
+	public Point getAnchorPoint() {
+		return this.anchorPoint;
+	}
+	
+	public void setAnchorPoint(Point point) {
+		this.anchorPoint=anchorPoint;
 	}
 }

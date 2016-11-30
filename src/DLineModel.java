@@ -1,35 +1,108 @@
+import java.awt.Point;
+import java.awt.Rectangle;
+
 
 public class DLineModel extends DShapeModel {
 	/**
-	 * DLineModel gets X and Y from DShapeModel
-	 * a line contains 2 points  p1(x, y) and p2(x2, y2)
+	 * a line contains 2 points  p1 and p2
 	 */
-	private int x2;
-	private int y2;
-	
-	public void setX2(int x2) {
-		this.x2=x2;
+	private Point p1;
+	private Point p2;
+	//pin is a point used as an anchor
+	//private Point pin;
+	/**
+	 * construction
+	 * uses p1 as pin
+	 */
+	public DLineModel() {
+		p1 = new Point();
+		p2= new Point();
+		setAnchorPoint(p1);
+	}
+	public void setP1(Point p1) {
+		this.p1=p1;
+		setBound();	
 	}
 	
-	public int getX2() {
-		return this.x2;
+	public Point getP1() {
+		return this.p1;
 	}
 	
-	public void setY2(int y2) {
-		this.y2=y2;
+	public void setP2(Point p2) {
+		this.p2=p2;
+		setBound();
 	}
 	
-	public int getY2() {
-		return this.y2;
+	public Point getP2() {
+		return this.p2;
 	}
 	
 	
-	public double calculateSlope() {
-		return ((double)(this.getY2() - getY()))/((double)(this.getX2() - getX()));
+	/*
+	 * set the conceptual bound for a line
+	 */
+	private void setBound()
+	{
+		Rectangle bound= new Rectangle(Math.min(p1.x, p2.x), Math.min(p1.y,p2.y), Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y));
+		super.setBound(bound);
 	}
-	 @Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return "DLine";
+	
+	@Override
+	/**
+	 * set the correct x coordinate of p1 and p2
+	 * @param x given X
+	 */
+	public void setX(int x) {
+		int newX = x;
+		p1.x += newX;
+		p2.x += newX;
+		setBound();
 	}
+	
+	@Override
+	/**
+	 * set the correct y coordinate of p1 and p2
+	 * @param y given Y
+	 */
+	public void setY(int y) {
+		int newY = y;
+		p1.y += newY;
+		p2.y += newY;
+		setBound();
+	}
+	
+	@Override
+	/**
+	 * Sets the horizontal distance between these two points
+	 * @param newWidth the new width of this line  
+	 */
+	public void setWidth(int width) {
+		if (super.getAnchorPoint()==p1){
+			p2.x = p1.x + width;
+		}
+		else{
+			p1.x = p2.x + width;
+		}
+		setBound();
+	}
+	
+	@Override
+	
+	/**
+	 * Sets the vertical distance between these two points
+	 * @param newHeight the new height of this line
+	 */
+	public void setHeight(int height) {
+		if (super.getAnchorPoint()==p1){
+			p2.y = p1.y + height;
+		}
+		else{
+			p1.y = p2.y + height;
+		}
+		setBound();
+	}
+	
+	
+	
+	
 }

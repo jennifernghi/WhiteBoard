@@ -50,7 +50,7 @@ public class Canvas extends JPanel{
 				int y = e.getY();
 
 				for (DShape shape: shapes){
-					Rectangle bound = shape.getBounds();
+					Rectangle bound = shape.getdShapeModel().getBound();
 
 					if (bound.contains(x, y)){
 						//System.out.println("hi this works");
@@ -131,7 +131,26 @@ public class Canvas extends JPanel{
 	 * @param shape
 	 */
 	public void addShape(DShapeModel dShapeModel) {
-		 
+			DShape dShape = null;
+			if (dShapeModel instanceof DRectModel) {
+				dShape = new DRect();
+			}
+			else if (dShapeModel instanceof DOvalModel) {
+				dShape = new DOval();
+			}
+			else if (dShapeModel instanceof DLineModel) {
+				dShape = new DLine();
+			}
+			else if(dShapeModel instanceof DTextModel){
+				
+				dShape = new DText(); 
+			}
+			
+			dShape.setdShapeModel(dShapeModel);
+			
+			dShape.setCanvas(this);
+			shapes.add(dShape);
+			repaint();
     }
 	
 	protected void updateTable(DShape shape){
