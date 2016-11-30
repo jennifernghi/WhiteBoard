@@ -73,8 +73,8 @@ public class DLineModel extends DShapeModel {
 	
 	@Override
 	/**
-	 * Sets the horizontal distance between these two points
-	 * @param newWidth the new width of this line  
+	 * Set correct distance (width) between p1 and p2
+	 * @param width  
 	 */
 	public void setWidth(int width) {
 		if (super.getAnchorPoint()==p1){
@@ -87,10 +87,9 @@ public class DLineModel extends DShapeModel {
 	}
 	
 	@Override
-	
 	/**
-	 * Sets the vertical distance between these two points
-	 * @param newHeight the new height of this line
+	 * Set correct distance (height) between p1 and p2
+	 * @param height  
 	 */
 	public void setHeight(int height) {
 		if (super.getAnchorPoint()==p1){
