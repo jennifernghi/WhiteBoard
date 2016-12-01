@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -27,9 +28,30 @@ public class Canvas extends JPanel{
 		showCanvasGUI();
 		initializeTable();
 		initializeMouseEvent();
-		//System.out.println("hi this is happening");
+		
 	}
 	
+	/**
+	 * set selected shape
+	 * notify changes on that selected shape
+	 * @param shape
+	 */
+	public void setSelected(DShape shape) {
+		selected = shape;	
+		if (shape!=null) {
+			selected.getdShapeModel().notifyIndividualChange();
+			
+		}
+		repaint();
+	}
+	/**
+	 * get selected shape
+	 * @return selected DShape
+	 */
+	public DShape getSelected()
+	{
+		return selected;
+	}
 	public void addShapeToList(DShape shape) {
 		shapes.add(shape);
 		repaint();
@@ -50,7 +72,7 @@ public class Canvas extends JPanel{
 				int y = e.getY();
 
 				for (DShape shape: shapes){
-					Rectangle bound = shape.getdShapeModel().getBound();
+					Rectangle bound = shape.getdShapeModel().getBounds();
 
 					if (bound.contains(x, y)){
 						//System.out.println("hi this works");
@@ -63,11 +85,11 @@ public class Canvas extends JPanel{
 						add(cursor);
 						}
 						else{
-							cursor.setBounds(x,y, 10,10);
+							//cursor.setBounds(x,y, 10,10);
 							add(cursor);
 						}
 
-						selected = shape; 
+						setSelected(shape);
 						
 					}
 				}
@@ -122,6 +144,10 @@ public class Canvas extends JPanel{
         for (DShape shape : shapes) {
         	//loop through all the shapes and draw them
             shape.draw(g);
+            if (shape.equals(selected)) {
+				Rectangle biggerBounds = shape.getBiggerBounds();
+				g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width, biggerBounds.height);
+			}
         }
 
     }
@@ -147,10 +173,9 @@ public class Canvas extends JPanel{
 			}
 			
 			dShape.setdShapeModel(dShapeModel);
-			
 			dShape.setCanvas(this);
-			shapes.add(dShape);
-			repaint();
+			addShapeToList(dShape);
+			
     }
 	
 	protected void updateTable(DShape shape){
@@ -160,5 +185,31 @@ public class Canvas extends JPanel{
 		 columnsData[3] = shape.getdShapeModel().getWidth();
 
 	        table.addRow(columnsData);
+	}
+	/**
+	 * if selected shape is a dtext
+	 * repaint it
+	 * @param text
+	 */
+	public void repaintText(String text) {
+		if(selected!=null){
+			if(selected instanceof DText){
+				DText dText = (DText) selected;
+				dText.setText(text);
+				repaint();
+			}
+		}
+		
+	}
+	
+	public void setFontName(String font)
+	{
+		if(selected!=null){
+			if(selected instanceof DText){
+				DText dText = (DText) selected;
+					dText.setFontName(font);
+			        repaint();
+			}
+		}
 	}
 }

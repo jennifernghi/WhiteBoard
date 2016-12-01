@@ -118,26 +118,43 @@ public abstract class DShapeModel {
 		}
 	}
 	/**
+	 * when selected model change, loop through listeners
+	 * send modelChanged()
+	 */
+	 
+	public void notifyIndividualChange() {
+		for (ModelListener modelListener: listeners)
+		{
+			modelListener.individualChanged(this);
+		}
+	}
+	/**
 	 * get the conceptual bound
 	 */
-	public void setBound(Rectangle conceptualBound) {
+	public void setBounds(Rectangle conceptualBound) {
 		this.conceptualBound= conceptualBound;
 		notifyModelChanged();
 	}
-	
-	public Rectangle getBound() {
+	/**
+	 * get the conceptual rectangle bound of the shape
+	 * @return
+	 */
+	public Rectangle getBounds() {
 		return this.conceptualBound;
 	}
-	/*public Rectangle getBounds(){
-		return new Rectangle(getX(), getY(), getWidth(), getHeight());
-	}*/
 	
-
+	/**
+	 * get anchor point
+	 * @return point
+	 */
 	public Point getAnchorPoint() {
 		return this.anchorPoint;
 	}
-	
+	/**
+	 * set anchor point
+	 * @param point
+	 */
 	public void setAnchorPoint(Point point) {
-		this.anchorPoint=anchorPoint;
+		this.anchorPoint=point;
 	}
 }
