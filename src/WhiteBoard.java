@@ -1,14 +1,17 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
-import java.awt.Color; 
+import java.awt.Color;
 import java.util.Random;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,6 +29,15 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	
 	private Canvas canvas;
 	
+	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
+	addOvalButton, addLineButton, addTextButton, setColorButton, moveFrontButton, moveBackButton,
+	removeShapeButton;
+	private JLabel networkStatus;
+	private JColorChooser colorChooser = new JColorChooser();
+	private JComboBox<String> fontChooser;
+	private JTextField textField;
+	//private Canvas canvas;
+	private JTable table;
 	
 	 public WhiteBoard() {
 		 	
@@ -40,19 +52,349 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private void showWhiteBoardGUI() {
 		//whole whiteboard gui + canvas
 			canvas = new Canvas();
-			
-			ControlGui controlGui = this.new ControlGui(canvas.getTableModel());
-	
+
 			
 			JFrame frame = new JFrame("WhiteBoard");
 			frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 			frame.setLayout(new BorderLayout());
 			frame.add(canvas, BorderLayout.CENTER);
-			frame.add(controlGui, BorderLayout.WEST);
+			frame.add(showControlGUI(), BorderLayout.WEST);
 			frame.setVisible(true);
 			frame.pack();
 	}
 
+	private Box showControlGUI() {
+		
+		Box controlBox = Box.createVerticalBox();
+
+		Box networkBox = showNetWorkBox();
+		Box fileBox = showFileBox();
+		Box addShapesBox = showAddShapesBox();
+		Box setColorBox = showSetColorBox();
+		Box editTextBox = showEditTextBox();
+		Box editShapeBox = showEditShapeBox();
+		JScrollPane scrollPane = showTableGUI();
+		
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(networkBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(fileBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(addShapesBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(setColorBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(editTextBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(editShapeBox);
+		controlBox.add(Box.createVerticalStrut(10));
+		controlBox.add(scrollPane);
+		//align all components to the left
+		for (Component comp : controlBox.getComponents()) {
+				((JComponent)comp).setAlignmentX(LEFT_ALIGNMENT);
+		}
+				
+		
+		return controlBox;
+	}
+
+	private Box showSetColorBox() {
+		Box setColorBox = Box.createHorizontalBox();
+		setColorButton = new JButton("Set Color");
+
+		setColorButton.addActionListener(e -> setColor());
+		setColorBox.add(setColorButton);
+		return setColorBox;
+	}
+
+
+
+
+
+
+	private Box showNetWorkBox() {
+		
+		Box netWorkBox = Box.createHorizontalBox();
+		
+		 networkStatus = new JLabel("Status:");
+
+		 serverStartButton = new JButton("Start Server");
+		 serverStartButton.addActionListener(e -> serverStart());
+		 clientStartButton = new JButton("Start Client");
+		 clientStartButton.addActionListener(e -> clientStart());
+		
+		 netWorkBox.add(serverStartButton);
+		 netWorkBox.add(clientStartButton);
+		 netWorkBox.add(networkStatus);
+		 return netWorkBox;
+	}
+
+	private Box showFileBox() {
+		Box fileBox = Box.createHorizontalBox();
+		 saveButton = new JButton("Save");
+		 openButton = new JButton("Open");
+		 saveImageButton = new JButton("Save Image");
+
+		saveButton.addActionListener(e -> save());
+		openButton.addActionListener(e -> open());
+		saveImageButton.addActionListener(e -> saveImage());
+		fileBox.add(saveButton);
+		fileBox.add(openButton);
+		fileBox.add(saveImageButton);
+		return fileBox;
+	}
+
+	private Box showAddShapesBox() {
+		Box addShapeBox = Box.createHorizontalBox();
+		 addRectButton = new JButton("Rect");
+		 addOvalButton = new JButton("Oval");
+		 addLineButton = new JButton("Line");
+		 addTextButton = new JButton("Text");
+
+		addRectButton.addActionListener(e -> addRect());
+		addOvalButton.addActionListener(e -> addOval());
+		addLineButton.addActionListener(e -> addLine());
+		addTextButton.addActionListener(e -> addText());
+
+		addShapeBox.add(addRectButton);
+		addShapeBox.add(addOvalButton);
+		addShapeBox.add(addLineButton);
+		addShapeBox.add(addTextButton);
+		return addShapeBox;
+	}
+	
+
+	private Box showEditTextBox() {
+		Box editTextBox = Box.createHorizontalBox();
+		 textField = new JTextField("");
+		textField.setEnabled(false);
+		String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		
+		 fontChooser = new JComboBox<String>(fonts);
+		fontChooser.setEnabled(false);
+		fontChooser.addActionListener(e -> chooseFont());
+
+		/**
+		 * handle changes in the textfield
+		 */
+		textField.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				//repaint text on canvas
+				repaintText(textField.getText());
+			}
+
+			
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				//repaint text on canvas
+				repaintText(textField.getText());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				//repaint text on canvas
+				repaintText(textField.getText());
+			}
+		});
+		editTextBox.add(textField);
+		editTextBox.add(fontChooser);
+		
+		return editTextBox;
+		
+	}
+	
+	/**
+	 * choose font from JComboBox
+	 */
+	private void chooseFont() {
+		String fontName = (String) fontChooser.getSelectedItem();
+		
+		canvas.setFontName(fontName);
+	}
+
+
+	private JScrollPane showTableGUI() {
+		
+		JTable table = new JTable(canvas.getTableModel());
+		
+		JScrollPane scrollPane = new JScrollPane(table);
+		
+		
+		return scrollPane;
+	}
+
+
+	private Box showEditShapeBox() {
+		Box editShapeBox = Box.createHorizontalBox();
+		
+		 moveFrontButton = new JButton("Move To Front");
+		 moveBackButton = new JButton("Move To Back");
+		 removeShapeButton = new JButton("Remove Shape");
+
+		moveFrontButton.addActionListener(e -> moveFront());
+		moveBackButton.addActionListener(e -> moveBack());
+		removeShapeButton.addActionListener(e -> removeShape());
+
+		editShapeBox.add(moveFrontButton);
+		editShapeBox.add(moveBackButton);
+		editShapeBox.add(removeShapeButton);
+		return editShapeBox;
+	}
+	/**
+	 * handle setColor
+	 */
+	private void setColor() {
+		 DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
+
+		Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor()); 
+		shapeModel.setColor(newColor);
+
+
+	}
+
+
+	/**
+	 * handle add text
+	 */
+	private void addText() {
+		DShapeModel text = new DTextModel();
+		addShape(text);
+	}
+
+	/**
+	 * handle add line
+	 */
+	private void addLine() {
+		DShapeModel line = new DLineModel();
+		addShape(line);
+		
+	}
+
+	/**
+	 * handle add oval
+	 */
+	private void addOval() {
+		DShapeModel oval = new DOvalModel();
+		addShape(oval);
+	}
+
+	/**
+	 * handle add rect
+	 */
+	private void addRect() {
+		DShapeModel rectangle = new DRectModel();
+		addShape(rectangle);
+	}
+
+	/**
+	 * handle saveImage
+	 */
+	private void saveImage() {
+
+	}
+
+	/**
+	 * handle open
+	 */
+	private void open() {
+
+	}
+
+	/**
+	 * handle save
+	 */
+	private void save() {
+
+	}
+	/**
+	 * handle remove shapes
+	 */
+	private void removeShape() {
+
+	}
+
+	/**
+	 * handle move Back
+	 */
+	private void moveBack() {
+
+	}
+
+	/**
+	 * handle move Front
+	 */
+	private void moveFront() {
+
+	}
+	/**
+	 * handle client-side networking
+	 */
+	private void clientStart() {
+
+	}
+
+	/**
+	 * handle server-side networking
+	 */
+	private void serverStart() {
+
+	}
+	/**
+	 * add shape with random x,y width and height
+	 * use addShape(dShapemodel) from canvas
+	 * @param dShapemodel 
+	 */
+	private void addShape(DShapeModel dShapemodel)
+	{
+		//initial shape
+		defaultShape(dShapemodel);
+		dShapemodel.addModelListener(this);
+		canvas.addShape(dShapemodel);
+	}
+	
+	private void defaultShape(DShapeModel dShapemodel){
+		dShapemodel.setX(10);
+		dShapemodel.setY(10);
+		dShapemodel.setWidth(20);
+		dShapemodel.setHeight(20);
+		
+	}
+
+	
+	private void repaintText(String text){
+		canvas.repaintText(text);
+	}
+	/**
+	 * if true, enable textField and JCombobox
+	 * if false, disable textField and JCombobox
+	 * @param state
+	 */
+	public void enableTextControlGUI(boolean state) {
+		if(state ==true){
+			textField.setEnabled(true);
+	        fontChooser.setEnabled(true);
+		}else{
+			textField.setText("");
+			textField.setEnabled(false);
+	        fontChooser.setEnabled(false);
+		}
+		
+	}
+	/**
+	 * update textfield and JCombobox with selected text' text and font name
+	 * @param text
+	 * @param fontName
+	 */
+	public void setTextControlGUI(String text, String fontName) {
+		// TODO Auto-generated method stub
+		textField.setText(text);
+		fontChooser.setSelectedItem(fontName);
+	}
+
+	
 
 
 
@@ -63,288 +405,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	}
 
 
-	class ControlGui extends JPanel {
-		// JPanel box = new JPanel();
-		private JPanel networkPanel = new JPanel();
-		private JPanel fileControlPanel = new JPanel();
-		private JPanel addShapesPanel = new JPanel();
-		private JPanel setColorPanel = new JPanel();
-		private JPanel editTextPanel = new JPanel();
-		private JPanel editShapePanel = new JPanel();
-		private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
-				addOvalButton, addLineButton, addTextButton, setColorButton, moveFrontButton, moveBackButton,
-				removeShapeButton;
-		private JLabel networkStatus;
-		private JColorChooser colorChooser = new JColorChooser();
-		private JComboBox<String> fontChooser;
-		private JTextField textField;
-		//private Canvas canvas;
-		private JTable table;
-
-		public ControlGui(TableModel model) {
-			
-			showControlGUI(model);
-		}
-
-		private void showControlGUI(TableModel model) {
-			this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-			this.setAlignmentX(LEFT_ALIGNMENT);
-
-			showNetWorkPanel();
-			showFilePanel();
-			showAddShapesControl();
-			showSetColorGui();
-			showEditTextPanel();
-			showEditShapePanel();
-			showTableGUI(model);
-
-		}
-
-		private void showEditShapePanel() {
-			editShapePanel.setLayout(new FlowLayout());
-			moveFrontButton = new JButton("Move To Front");
-			moveBackButton = new JButton("Move To Back");
-			removeShapeButton = new JButton("Remove Shape");
-
-			moveFrontButton.addActionListener(e -> moveFront());
-			moveBackButton.addActionListener(e -> moveBack());
-			removeShapeButton.addActionListener(e -> removeShape());
-
-			editShapePanel.add(moveFrontButton);
-			editShapePanel.add(moveBackButton);
-			editShapePanel.add(removeShapeButton);
-
-			this.add(editShapePanel);
-		}
-
-		/**
-		 * handle remove shapes
-		 */
-		private void removeShape() {
-
-		}
-
-		/**
-		 * handle move Back
-		 */
-		private void moveBack() {
-
-		}
-
-		/**
-		 * handle move Front
-		 */
-		private void moveFront() {
-
-		}
-
-		private void showEditTextPanel() {
-
-			textField = new JTextField("whiteboard!");
-			String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-			fontChooser = new JComboBox<String>(fonts);
-			fontChooser.addActionListener(e -> chooseFont());
-
-			/**
-			 * handle changes in the textfield
-			 */
-			textField.getDocument().addDocumentListener(new DocumentListener() {
-
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-					// TODO Auto-generated method stub
-
-				}
-			});
-			editTextPanel.add(textField);
-
-			editTextPanel.add(fontChooser);
-			add(editTextPanel);
-		}
-
-		/**
-		 * handle choose font
-		 */
-		private void chooseFont() {
-
-		}
-
-		private void showNetWorkPanel() {
-
-			networkStatus = new JLabel("Status:");
-
-			serverStartButton = new JButton("Start Server");
-			serverStartButton.addActionListener(e -> serverStart());
-			clientStartButton = new JButton("Start Client");
-			clientStartButton.addActionListener(e -> clientStart());
-			networkPanel.add(serverStartButton);
-			networkPanel.add(clientStartButton);
-			networkPanel.add(networkStatus);
-			add(networkPanel);
-
-		}
-
-		private void showFilePanel() {
-
-			saveButton = new JButton("Save");
-			openButton = new JButton("Open");
-			saveImageButton = new JButton("Save Image");
-
-			saveButton.addActionListener(e -> save());
-			openButton.addActionListener(e -> open());
-			saveImageButton.addActionListener(e -> saveImage());
-			fileControlPanel.add(saveButton);
-			fileControlPanel.add(openButton);
-			fileControlPanel.add(saveImageButton);
-			add(fileControlPanel);
-
-		}
-
-		private void showTableGUI(TableModel model) {
-
-			table = new JTable(model);
-			JScrollPane scrollPane = new JScrollPane(table);
-			this.add(scrollPane);
-		}
-
-		private void showSetColorGui() {
-
-			setColorButton = new JButton("Set Color");
-
-			setColorButton.addActionListener(e -> setColor());
-			setColorPanel.add(setColorButton);
-			add(setColorPanel);
-
-		}
-
-		private void setColor() {
-
-			DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
-
-			Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor()); 
-			shapeModel.setColor(newColor);
-
-
-		}
-
-		private void showAddShapesControl() {
-
-			addRectButton = new JButton("Rect");
-			addOvalButton = new JButton("Oval");
-			addLineButton = new JButton("Line");
-			addTextButton = new JButton("Text");
-
-			addRectButton.addActionListener(e -> addRect());
-			addOvalButton.addActionListener(e -> addOval());
-			addLineButton.addActionListener(e -> addLine());
-			addTextButton.addActionListener(e -> addText());
-
-			addShapesPanel.add(addRectButton);
-			addShapesPanel.add(addOvalButton);
-			addShapesPanel.add(addLineButton);
-			addShapesPanel.add(addTextButton);
-			add(addShapesPanel);
-
-		}
-
-		/**
-		 * handle add text
-		 */
-		private void addText() {
-
-		}
-
-		/**
-		 * handle add line
-		 */
-		private void addLine() {
-			DShapeModel line = new DLineModel();
-			addShape(line);
-			
-		}
-
-		/**
-		 * handle add oval
-		 */
-		private void addOval() {
-			DShapeModel oval = new DOvalModel();
-			addShape(oval);
-		}
-
-		/**
-		 * handle add rect
-		 */
-		private void addRect() {
-			DShapeModel rectangle = new DRectModel();
-			addShape(rectangle);
-		}
-
-		/**
-		 * handle saveImage
-		 */
-		private void saveImage() {
-
-		}
-
-		/**
-		 * handle open
-		 */
-		private void open() {
-
-		}
-
-		/**
-		 * handle save
-		 */
-		private void save() {
-
-		}
-
-		/**
-		 * handle client-side networking
-		 */
-		private void clientStart() {
-
-		}
-
-		/**
-		 * handle server-side networking
-		 */
-		private void serverStart() {
-
-		}
-		/**
-		 * add shape with random x,y width and hight
-		 * use addShape(dShapemodel) from canvas
-		 * @param dShapemodel 
-		 */
-		private void addShape(DShapeModel dShapemodel)
-		{
-			
-			Random ran = new Random();
-			dShapemodel.setX(20);
-			dShapemodel.setY(20);
-			dShapemodel.setWidth(ran.nextInt(100));
-			dShapemodel.setHeight(ran.nextInt(100));
-			canvas.addShape(dShapemodel);
-		}
-
-		
-
-		
-	}
+	
 
 
 	@Override
@@ -352,8 +413,23 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void individualChanged(DShapeModel model) {
+		//if selected is a dtextmodel
+		if (model instanceof DTextModel) {
+			DTextModel dTextModel =  (DTextModel) model;
+			enableTextControlGUI(true); //enable textField and JCombobox
+			setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());//update textfield and JCombobox with selected text' text and font name
+			
+		}
+		else {
+			//disable textField & JCombobox
+			enableTextControlGUI(false);
+		}
+	}
 	
 	 
 }
-
 

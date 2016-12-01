@@ -8,31 +8,44 @@ public class DLineModel extends DShapeModel {
 	 */
 	private Point p1;
 	private Point p2;
-	//pin is a point used as an anchor
-	//private Point pin;
+
+	
 	/**
 	 * construction
-	 * uses p1 as pin
+	 * uses p1 as anchorPoint
 	 */
 	public DLineModel() {
 		p1 = new Point();
 		p2= new Point();
 		setAnchorPoint(p1);
 	}
+	/**
+	 * set P1
+	 * @param p1
+	 */
 	public void setP1(Point p1) {
 		this.p1=p1;
-		setBound();	
+		setBounds();	
 	}
-	
+	/**
+	 * get P1
+	 * @return p1
+	 */
 	public Point getP1() {
 		return this.p1;
 	}
-	
+	/**
+	 * set P2
+	 * @param p2
+	 */
 	public void setP2(Point p2) {
 		this.p2=p2;
-		setBound();
+		setBounds();
 	}
-	
+	/**
+	 * get P2
+	 * @return
+	 */
 	public Point getP2() {
 		return this.p2;
 	}
@@ -41,10 +54,10 @@ public class DLineModel extends DShapeModel {
 	/*
 	 * set the conceptual bound for a line
 	 */
-	private void setBound()
+	private void setBounds()
 	{
 		Rectangle bound= new Rectangle(Math.min(p1.x, p2.x), Math.min(p1.y,p2.y), Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y));
-		super.setBound(bound);
+		super.setBounds(bound);
 	}
 	
 	@Override
@@ -56,7 +69,7 @@ public class DLineModel extends DShapeModel {
 		int newX = x - super.getX();
 		p1.x += newX;
 		p2.x += newX;
-		setBound();
+		setBounds();
 	}
 	
 	@Override
@@ -68,7 +81,7 @@ public class DLineModel extends DShapeModel {
 		int newY = y - super.getY();
 		p1.y += newY;
 		p2.y += newY;
-		setBound();
+		setBounds();
 	}
 	
 	@Override
@@ -83,7 +96,7 @@ public class DLineModel extends DShapeModel {
 		else{
 			p1.x = p2.x + width;
 		}
-		setBound();
+		setBounds();
 	}
 	
 	@Override
@@ -98,10 +111,8 @@ public class DLineModel extends DShapeModel {
 		else{
 			p1.y = p2.y + height;
 		}
-		setBound();
+		setBounds();
 	}
 	
-	
-	
-	
+
 }

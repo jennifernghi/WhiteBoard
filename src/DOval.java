@@ -5,14 +5,15 @@ import java.awt.geom.Ellipse2D;
 
 public class DOval extends DShape {
 
-        
-       
 
 		@Override
     	public void draw(Graphics g){
-			Shape dOval = new Ellipse2D.Double(getdShapeModel().getX(), getdShapeModel().getY(), getdShapeModel().getWidth(), getdShapeModel().getHeight());
+			DOvalModel dOvalModel = (DOvalModel) getdShapeModel();
+			Shape dOval = new Ellipse2D.Double(dOvalModel.getX(), dOvalModel.getY(), dOvalModel.getWidth(), dOvalModel.getHeight());
 			Graphics2D s = (Graphics2D) g;
 			s.setColor(getdShapeModel().getColor());
 			s.fill(dOval);
     	}
+
+		
 }
