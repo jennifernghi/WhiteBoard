@@ -1,32 +1,28 @@
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
 import java.awt.Color;
-import java.util.Random;
+import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.TableModel;
 
 
 
 public class WhiteBoard extends JFrame implements ModelListener {
 
 	
+	
+
 	private Canvas canvas;
 	
 	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
@@ -38,6 +34,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private JTextField textField;
 	//private Canvas canvas;
 	private JTable table;
+	
 	
 	 public WhiteBoard() {
 		 	
@@ -106,10 +103,6 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		setColorBox.add(setColorButton);
 		return setColorBox;
 	}
-
-
-
-
 
 
 	private Box showNetWorkBox() {
@@ -218,7 +211,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	private JScrollPane showTableGUI() {
 		
-		JTable table = new JTable(canvas.getTableModel());
+		 table = new JTable(canvas.getTableModel());
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		
@@ -351,10 +344,17 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	{
 		//initial shape
 		defaultShape(dShapemodel);
+		
+		//register the view WhiteBoard to listener
 		dShapemodel.addModelListener(this);
+		
+		//create correct shape using addShape() on canvas
 		canvas.addShape(dShapemodel);
 	}
-	
+	/**
+	 * default shape 
+	 * @param dShapemodel
+	 */
 	private void defaultShape(DShapeModel dShapemodel){
 		dShapemodel.setX(10);
 		dShapemodel.setY(10);
@@ -363,7 +363,10 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		
 	}
 
-	
+	/**
+	 * repaint dText
+	 * @param text
+	 */
 	private void repaintText(String text){
 		canvas.repaintText(text);
 	}
