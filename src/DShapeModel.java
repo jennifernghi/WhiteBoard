@@ -108,6 +108,10 @@ public abstract class DShapeModel {
 	public void removeModelListener(ModelListener listener) {
 		this.listeners.remove(listener);
 	}
+
+	public void removeAllModelListeners(){
+        listeners.clear();
+    }
 	/**
 	 * when this model change, loop through listeners
 	 * send modelChanged()

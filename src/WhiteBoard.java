@@ -306,7 +306,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle remove shapes
 	 */
 	private void removeShape() {
-
+		canvas.deleteShape();
 	}
 
 	/**
