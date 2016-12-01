@@ -3,6 +3,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.Color;
 import java.util.Random;
 
 import javax.swing.Box;
@@ -246,6 +247,11 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle setColor
 	 */
 	private void setColor() {
+		 DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
+
+		Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor()); 
+		shapeModel.setColor(newColor);
+
 
 	}
 
@@ -426,5 +432,4 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	
 	 
 }
-
 

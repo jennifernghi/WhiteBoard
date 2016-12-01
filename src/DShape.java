@@ -1,5 +1,9 @@
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.Point; 
+
+import java.util.List;
+import java.util.ArrayList;
 
 public abstract class DShape implements ModelListener {
 	
@@ -35,6 +39,22 @@ public abstract class DShape implements ModelListener {
 	public Rectangle getBounds(){
 		return dShapeModel.getBounds();
 	}
+	
+
+
+	public List<Point> getKnobs(){
+		List<Point> points = new ArrayList<Point>();
+
+		Rectangle bound = dShapeModel.getBounds();
+
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY())));
+		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)bound.getY()));
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY()+bound.getHeight())));
+		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)(bound.getY()+bound.getHeight())));
+
+		return points;
+	}
+
 	/**
 	 * set canvas
 	 * @param canvas

@@ -22,6 +22,7 @@ public class Canvas extends JPanel{
 	private DefaultTableModel table;
 	private Integer[] columnsData = new Integer[4]; //4 columns
 	private DShape selected ;
+	private List<Point> selectedKnobs = new ArrayList<Point>();
 	private JTextField cursor;  //pointer of the selected shape on Canvas
 
 	public Canvas() {
@@ -68,29 +69,22 @@ public class Canvas extends JPanel{
 				//if at the end all is not within bound, then quit
 				//System.out.println("hi this is happening");
 
+
 				int x = e.getX();
 				int y = e.getY();
 
-				for (DShape shape: shapes){
+				for (int i = shapes.size()-1; i>=0; i--){
+					DShape shape = shapes.get(i);
 					Rectangle bound = shape.getdShapeModel().getBounds();
 
 					if (bound.contains(x, y)){
-						//System.out.println("hi this works");
-						if (cursor == null){
-						cursor = new JTextField("x"); 
-						cursor.setBounds(x, y, 10,10);
-						//cursor.setColor(new Color(0,0,0,0));
-						cursor.setOpaque(false);  
-						cursor.setBorder(null); 
-						add(cursor);
-						}
-						else{
-							//cursor.setBounds(x,y, 10,10);
-							add(cursor);
-						}
-
-						setSelected(shape);
-						
+						selectedKnobs = shape.getKnobs();
+						setSelected(shape);		
+						break;
+					}
+					else{
+						selectedKnobs.clear();
+						setSelected(null);
 					}
 				}
 
@@ -106,6 +100,18 @@ public class Canvas extends JPanel{
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				//only this method needed
+
+				if(selected != null){
+				DShapeModel selectedModel = selected.getdShapeModel();
+
+				int x = e.getX();
+				int y = e.getY();
+
+				selectedModel.setX(x);
+				selectedModel.setY(y);
+
+				selectedKnobs = selected.getKnobs();
+				}
 				
 			}
 
@@ -148,6 +154,14 @@ public class Canvas extends JPanel{
 				Rectangle biggerBounds = shape.getBiggerBounds();
 				g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width, biggerBounds.height);
 			}
+        }
+
+           if(selectedKnobs != null){
+        	for(Point p: selectedKnobs){
+        		g.drawRect((int) p.getX(), (int) p.getY(), 3, 3);
+        		g.setColor(Color.BLACK);
+        		g.fillRect((int) p.getX(), (int) p.getY(), 3, 3);
+        	}
         }
 
     }
@@ -213,3 +227,4 @@ public class Canvas extends JPanel{
 		}
 	}
 }
+
