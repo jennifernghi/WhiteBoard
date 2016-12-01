@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 
 public class Canvas extends JPanel {
 	final static int CANVAS_SIZE = 400;
-	final static int KNOB_SIZE = 9;
+	final static int KNOB_SIZE = 3;
 	private List<DShape> shapes = new ArrayList<DShape>();
 	private DefaultTableModel table;
 	private Integer[] columnsData = new Integer[4]; // 4 columns
@@ -195,6 +195,17 @@ public class Canvas extends JPanel {
 		dShapeTableModel.fireTableDataChanged();
 
 	}
+
+	    public void deleteShape(){
+    	if(selected !=null){
+    		//TODO Remove from list, WhiteBoard listeners and dShape listeners, dShapeModel
+    		//get selected model, callremove listeners, remove knobs 
+    		selected.getdShapeModel().removeAllModelListeners(); //remove all listeners: whiteBoard and Dsahpe   		
+    		shapes.remove(selected); //remove from list
+    		selectedKnobs.clear(); 
+    		setSelected(null);
+    	}
+    }
 
 	/**
 	 * if selected shape is a dtext repaint it
