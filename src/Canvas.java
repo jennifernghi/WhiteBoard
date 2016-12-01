@@ -204,6 +204,7 @@ public class Canvas extends JPanel {
     		shapes.remove(selected); //remove from list
     		selectedKnobs.clear(); 
     		setSelected(null);
+    		dShapeTableModel.fireTableDataChanged();
     	}
     }
 
