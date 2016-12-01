@@ -1,5 +1,6 @@
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.Color; 
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -181,6 +182,16 @@ public class ControlGui extends JPanel {
 	}
 
 	private void setColor() {
+
+		DShape selected = canvas.getSelected();
+
+		if (selected !=null){
+			//need to get the current color of shape to set default
+			//set newColor to where..pass it to where?
+			DShapeModel selectedModel = selected.getdShapeModel();
+			Color newColor = JColorChooser.showDialog(null, "Color Picker", selectedModel.getColor());
+			selectedModel.setColor(newColor);
+		}
 
 	}
 
