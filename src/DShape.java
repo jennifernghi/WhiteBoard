@@ -1,8 +1,11 @@
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.Point;
+import java.util.List;
+import java.util.ArrayList;
 
 public abstract class DShape implements ModelListener {
-	boolean selected;
+	boolean selected; //is this needed ?
 	private DShapeModel dShapeModel;
 	private Canvas canvas;
 	 
@@ -29,12 +32,18 @@ public abstract class DShape implements ModelListener {
 		dShapeModel.addModelListener(this);
 	}
 
-	/*
-	//TODO getBounds
-	
-	public Rectangle getBounds(){
-		return dShapeModel.getBounds();
-	}*/
+	public List<Point> getKnobs(){
+		List<Point> points = new ArrayList<Point>();
+
+		Rectangle bound = dShapeModel.getBound();
+
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY())));
+		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)bound.getY()));
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY()+bound.getHeight())));
+		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)(bound.getY()+bound.getHeight())));
+
+		return points;
+	}
 	
 	public void setCanvas(Canvas canvas) {
 		this.canvas = canvas;
