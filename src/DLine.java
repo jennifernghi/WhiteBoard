@@ -11,7 +11,7 @@ public class DLine extends DShape {
 		Point p1 = dLineModel.getP1();
 		Point p2 = dLineModel.getP2();
 		Graphics2D dLine = (Graphics2D) g;
-		dLine.setColor(getdShapeModel().getColor());
+		dLine.setColor(dLineModel.getColor());
 		dLine.drawLine(p1.x, p1.y, p2.x, p2.y);
 	}
 }
