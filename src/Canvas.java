@@ -243,4 +243,20 @@ public class Canvas extends JPanel {
 		return dShapeTableModel;
 	}
 
+	public void moveFront(DShape selected) {
+		shapes.remove(selected);
+		shapes.add(shapes.size(), selected);
+		repaint();
+		dShapeTableModel.fireTableDataChanged();
+		
+	}
+
+	public void moveBack(DShape selected) {
+		shapes.remove(selected);
+		shapes.add(0, selected);
+		repaint();
+		dShapeTableModel.fireTableDataChanged();
+		
+	}
+
 }
