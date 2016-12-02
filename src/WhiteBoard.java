@@ -1,3 +1,4 @@
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -429,4 +430,6 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		}
 	}
 
+
 }
+

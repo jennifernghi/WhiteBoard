@@ -26,6 +26,8 @@ public class Canvas extends JPanel {
 	private List<Point> selectedKnobs = new ArrayList<Point>();
 	private JTextField cursor; // pointer of the selected shape on Canvas
 	private DShapeModelTable dShapeTableModel;
+	private Point movingPt;
+	private Point anchorPt;
 
 	public Canvas() {
 		showCanvasGUI();
@@ -83,18 +85,36 @@ public class Canvas extends JPanel {
 					DShape shape = shapes.get(i);
 					Rectangle bound = shape.getdShapeModel().getBounds();
 
+					
 					if (bound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
 						setSelected(shape);
+						for (Point p: selectedKnobs){
+							//System.out.println(p.getX()+" "+p.getY());
+							Rectangle knobBound = new Rectangle((int)p.getX(), (int)p.getY(), KNOB_SIZE, KNOB_SIZE);
+							if (knobBound.contains(x,y)){
+								//System.out.println("hi this works");
+
+								movingPt = p;
+
+								//find anchor point
+								int index = selectedKnobs.indexOf(movingPt);
+								anchorPt = selectedKnobs.get((index+2)%4);
+								//System.out.println(((index+2)%4)+" "+index+" "+anchorPt.getX() +" "+anchorPt.getY());
+
+								break;
+							}else{
+								movingPt =null;
+							}
+						}
 						break;
 					} else {
 						selectedKnobs.clear();
 						setSelected(null);
 					}
+					
 				}
-
 			}
-
 		});
 
 		this.addMouseMotionListener(new MouseMotionListener() {
@@ -103,7 +123,20 @@ public class Canvas extends JPanel {
 			public void mouseDragged(MouseEvent e) {
 				// only this method needed
 
-				if (selected != null) {
+				if(selected !=null){
+
+				if (movingPt != null ){
+					movingPt= new Point(e.getX(), e.getY());
+					Rectangle newBound = new Rectangle((int)movingPt.getX(), (int)movingPt.getY(), 
+												(int)Math.abs(anchorPt.getX()-movingPt.getX()), (int)Math.abs(anchorPt.getY()-movingPt.getY()));
+					
+					selected.getdShapeModel().setX((int)newBound.getX());
+					selected.getdShapeModel().setY((int)newBound.getY());
+					selected.getdShapeModel().setWidth((int)newBound.getWidth());
+					selected.getdShapeModel().setHeight((int)newBound.getHeight());
+
+
+				}else {
 					DShapeModel selectedModel = selected.getdShapeModel();
 
 					int x = e.getX();
@@ -112,10 +145,11 @@ public class Canvas extends JPanel {
 					selectedModel.setX(x);
 					selectedModel.setY(y);
 
-					selectedKnobs = selected.getKnobs();
 				}
+				selectedKnobs = selected.getKnobs();
 
 			}
+		}
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -181,32 +215,37 @@ public class Canvas extends JPanel {
 
 			dShape = new DText();
 		}
-		//register listener on dShapeTableModel
+		// register listener on dShapeTableModel
 		dShapeModel.addModelListener(dShapeTableModel);
-		
-		//set correct dShapeModel for dShape
+
+		// set correct dShapeModel for dShape
 		dShape.setdShapeModel(dShapeModel);
 		dShape.setCanvas(this);
-		
-		//add this dShape to shapes list
+
+		// add this dShape to shapes list
 		addShapeToList(dShape);
-		
-		//update dShapeTableModel
+
+		// update dShapeTableModel
 		dShapeTableModel.fireTableDataChanged();
 
 	}
 
-	    public void deleteShape(){
-    	if(selected !=null){
-    		//TODO Remove from list, WhiteBoard listeners and dShape listeners, dShapeModel
-    		//get selected model, callremove listeners, remove knobs 
-    		selected.getdShapeModel().removeAllModelListeners(); //remove all listeners: whiteBoard and Dsahpe   		
-    		shapes.remove(selected); //remove from list
-    		selectedKnobs.clear(); 
-    		setSelected(null);
-    		dShapeTableModel.fireTableDataChanged();
-    	}
-    }
+	public void deleteShape() {
+		if (selected != null) {
+			// TODO Remove from list, WhiteBoard listeners and dShape listeners,
+			// dShapeModel
+			// get selected model, callremove listeners, remove knobs
+			selected.getdShapeModel().removeAllModelListeners(); // remove all
+																	// listeners:
+																	// whiteBoard
+																	// and
+																	// Dsahpe
+			shapes.remove(selected); // remove from list
+			selectedKnobs.clear();
+			setSelected(null);
+			dShapeTableModel.fireTableDataChanged();
+		}
+	}
 
 	/**
 	 * if selected shape is a dtext repaint it
@@ -248,7 +287,7 @@ public class Canvas extends JPanel {
 		shapes.add(shapes.size(), selected);
 		repaint();
 		dShapeTableModel.fireTableDataChanged();
-		
+
 	}
 
 	public void moveBack(DShape selected) {
@@ -256,7 +295,6 @@ public class Canvas extends JPanel {
 		shapes.add(0, selected);
 		repaint();
 		dShapeTableModel.fireTableDataChanged();
-		
-	}
 
+	}
 }
