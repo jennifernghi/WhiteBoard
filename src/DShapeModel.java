@@ -8,7 +8,7 @@ public abstract class DShapeModel {
 	
 	//the rectangle "conceptual" bound of the shape
 	private Rectangle conceptualBound; 
-	private Point anchorPoint; //used for resizing, this point(s) not moving while resizing
+	private Point anchorPoint; //used for resizing, this point(s) not moving while resizing; no need this
 	private Color color;
 	private ArrayList<ModelListener> listeners = new ArrayList<>();
 

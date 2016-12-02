@@ -23,6 +23,8 @@ public class Canvas extends JPanel {
 	private DefaultTableModel table;
 	private Integer[] columnsData = new Integer[4]; // 4 columns
 	private DShape selected;
+	private Point movingPt;
+	private Point anchorPt;
 	private List<Point> selectedKnobs = new ArrayList<Point>();
 	private JTextField cursor; // pointer of the selected shape on Canvas
 	private DShapeModelTable dShapeTableModel;
@@ -63,8 +65,8 @@ public class Canvas extends JPanel {
 	}
 
 	private void initializeMouseEvent() {
+		//Point movingPt =null; 
 		this.addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO call getBound and get rect boundary. ask if it is a
@@ -79,6 +81,8 @@ public class Canvas extends JPanel {
 				int x = e.getX();
 				int y = e.getY();
 
+				//System.out.println(x +" "+y);
+
 				for (int i = shapes.size() - 1; i >= 0; i--) {
 					DShape shape = shapes.get(i);
 					Rectangle bound = shape.getdShapeModel().getBounds();
@@ -86,12 +90,32 @@ public class Canvas extends JPanel {
 					if (bound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
 						setSelected(shape);
+						for (Point p: selectedKnobs){
+							//System.out.println(p.getX()+" "+p.getY());
+							Rectangle knobBound = new Rectangle((int)p.getX(), (int)p.getY(), KNOB_SIZE, KNOB_SIZE);
+							if (knobBound.contains(x,y)){
+								//System.out.println("hi this works");
+
+								movingPt = p;
+
+								//find anchor point
+								int index = selectedKnobs.indexOf(movingPt);
+								anchorPt = selectedKnobs.get((index+2)%4);
+								//System.out.println(((index+2)%4)+" "+index+" "+anchorPt.getX() +" "+anchorPt.getY());
+
+								break;
+							}else{
+								movingPt =null;
+							}
+						}
 						break;
 					} else {
 						selectedKnobs.clear();
 						setSelected(null);
 					}
 				}
+
+					
 
 			}
 
@@ -103,7 +127,20 @@ public class Canvas extends JPanel {
 			public void mouseDragged(MouseEvent e) {
 				// only this method needed
 
-				if (selected != null) {
+				if(selected !=null){
+
+				if (movingPt != null ){
+					movingPt= new Point(e.getX(), e.getY());
+					Rectangle newBound = new Rectangle((int)movingPt.getX(), (int)movingPt.getY(), 
+												(int)Math.abs(anchorPt.getX()-movingPt.getX()), (int)Math.abs(anchorPt.getY()-movingPt.getY()));
+					
+					selected.getdShapeModel().setX((int)newBound.getX());
+					selected.getdShapeModel().setY((int)newBound.getY());
+					selected.getdShapeModel().setWidth((int)newBound.getWidth());
+					selected.getdShapeModel().setHeight((int)newBound.getHeight());
+
+
+				}else {
 					DShapeModel selectedModel = selected.getdShapeModel();
 
 					int x = e.getX();
@@ -112,8 +149,9 @@ public class Canvas extends JPanel {
 					selectedModel.setX(x);
 					selectedModel.setY(y);
 
-					selectedKnobs = selected.getKnobs();
 				}
+				selectedKnobs = selected.getKnobs();
+			}
 
 			}
 
@@ -196,7 +234,7 @@ public class Canvas extends JPanel {
 
 	}
 
-	    public void deleteShape(){
+	public void deleteShape(){
     	if(selected !=null){
     		//TODO Remove from list, WhiteBoard listeners and dShape listeners, dShapeModel
     		//get selected model, callremove listeners, remove knobs 
@@ -241,6 +279,22 @@ public class Canvas extends JPanel {
 
 	public TableModel getTableModel() {
 		return dShapeTableModel;
+	}
+
+	public void moveFront(DShape selected) {
+		shapes.remove(selected);
+		shapes.add(shapes.size(), selected);
+		repaint();
+		dShapeTableModel.fireTableDataChanged();
+		
+	}
+
+	public void moveBack(DShape selected) {
+		shapes.remove(selected);
+		shapes.add(0, selected);
+		repaint();
+		dShapeTableModel.fireTableDataChanged();
+		
 	}
 
 }

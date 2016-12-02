@@ -46,11 +46,12 @@ public abstract class DShape implements ModelListener {
 		List<Point> points = new ArrayList<Point>();
 
 		Rectangle bound = dShapeModel.getBounds();
-
-		points.add(new Point((int)(bound.getX()), (int)(bound.getY())));
-		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)bound.getY()));
-		points.add(new Point((int)(bound.getX()), (int)(bound.getY()+bound.getHeight())));
+		//clockwise addition 
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY()))); //upper left
+		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)bound.getY())); //upper right
 		points.add(new Point((int)(bound.getX()+bound.getWidth()), (int)(bound.getY()+bound.getHeight())));
+		points.add(new Point((int)(bound.getX()), (int)(bound.getY()+bound.getHeight()))); //lower left
+
 
 		return points;
 	}
