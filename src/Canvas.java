@@ -18,16 +18,16 @@ import javax.swing.JTextField;
 
 public class Canvas extends JPanel {
 	final static int CANVAS_SIZE = 400;
-	final static int KNOB_SIZE = 3;
+	final static int KNOB_SIZE = 9;
 	private List<DShape> shapes = new ArrayList<DShape>();
 	private DefaultTableModel table;
 	private Integer[] columnsData = new Integer[4]; // 4 columns
 	private DShape selected;
 	private List<Point> selectedKnobs = new ArrayList<Point>();
-	private JTextField cursor; // pointer of the selected shape on Canvas
 	private DShapeModelTable dShapeTableModel;
 	private Point movingPt;
 	private Point anchorPt;
+	private int indexOfMoving; 
 
 	public Canvas() {
 		showCanvasGUI();
@@ -83,23 +83,23 @@ public class Canvas extends JPanel {
 
 				for (int i = shapes.size() - 1; i >= 0; i--) {
 					DShape shape = shapes.get(i);
-					Rectangle bound = shape.getdShapeModel().getBounds();
+					Rectangle biggerBound = shape.getBiggerBounds();
 
 					
-					if (bound.contains(x, y)) {
+					if (biggerBound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
-						setSelected(shape);
+						
 						for (Point p: selectedKnobs){
 							//System.out.println(p.getX()+" "+p.getY());
-							Rectangle knobBound = new Rectangle((int)p.getX(), (int)p.getY(), KNOB_SIZE, KNOB_SIZE);
+							Rectangle knobBound = new Rectangle((int)(p.getX()-4.5), (int)(p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
 							if (knobBound.contains(x,y)){
 								//System.out.println("hi this works");
 
 								movingPt = p;
 
 								//find anchor point
-								int index = selectedKnobs.indexOf(movingPt);
-								anchorPt = selectedKnobs.get((index+2)%4);
+								indexOfMoving = selectedKnobs.indexOf(movingPt);
+								anchorPt = selectedKnobs.get((indexOfMoving+2)%4);
 								//System.out.println(((index+2)%4)+" "+index+" "+anchorPt.getX() +" "+anchorPt.getY());
 
 								break;
@@ -107,6 +107,7 @@ public class Canvas extends JPanel {
 								movingPt =null;
 							}
 						}
+						setSelected(shape);
 						break;
 					} else {
 						selectedKnobs.clear();
@@ -125,27 +126,55 @@ public class Canvas extends JPanel {
 
 				if(selected !=null){
 
-				if (movingPt != null ){
-					movingPt= new Point(e.getX(), e.getY());
-					Rectangle newBound = new Rectangle((int)movingPt.getX(), (int)movingPt.getY(), 
-												(int)Math.abs(anchorPt.getX()-movingPt.getX()), (int)Math.abs(anchorPt.getY()-movingPt.getY()));
-					
-					selected.getdShapeModel().setX((int)newBound.getX());
-					selected.getdShapeModel().setY((int)newBound.getY());
-					selected.getdShapeModel().setWidth((int)newBound.getWidth());
-					selected.getdShapeModel().setHeight((int)newBound.getHeight());
+					if (movingPt != null ){
+						movingPt= new Point(e.getX(), e.getY());
+						Rectangle newBound; 
+						//when moving knob is upper left
+						if(indexOfMoving ==0){
+							newBound = new Rectangle((int)movingPt.getX(), 
+														(int)movingPt.getY(), 
+														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
+														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
+						}
+						else if (indexOfMoving ==1){
+							//when moving knob is upper right
+							newBound = new Rectangle((int)(movingPt.getX()-(int)Math.abs(anchorPt.getX()-movingPt.getX())), 
+														(int)movingPt.getY(), 
+														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
+														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
+						}
+						else  if (indexOfMoving ==2){
+							//when moving knob is lower right
+							newBound = new Rectangle((int)(movingPt.getX() -(int)Math.abs(anchorPt.getX()-movingPt.getX())), 
+														(int)(movingPt.getY()-(int)Math.abs(anchorPt.getY()-movingPt.getY()) ) , 
+														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
+														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
+						}
+						else{
+							//when moving knob is lower left
+							newBound = new Rectangle((int)movingPt.getX(), 
+														(int)(movingPt.getY()-(int)Math.abs(anchorPt.getY()-movingPt.getY())), 
+														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
+														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
+						
+						}
+						
+						selected.getdShapeModel().setX((int)newBound.getX());
+						selected.getdShapeModel().setY((int)newBound.getY());
+						selected.getdShapeModel().setWidth((int)newBound.getWidth());
+						selected.getdShapeModel().setHeight((int)newBound.getHeight());
 
 
-				}else {
-					DShapeModel selectedModel = selected.getdShapeModel();
+					}else {
+						DShapeModel selectedModel = selected.getdShapeModel();
 
-					int x = e.getX();
-					int y = e.getY();
+						int x = e.getX();
+						int y = e.getY();
 
-					selectedModel.setX(x);
-					selectedModel.setY(y);
+						selectedModel.setX(x);
+						selectedModel.setY(y);
+					}
 
-				}
 				selectedKnobs = selected.getKnobs();
 
 			}
@@ -182,17 +211,17 @@ public class Canvas extends JPanel {
 		for (DShape shape : shapes) {
 			// loop through all the shapes and draw them
 			shape.draw(g);
-			if (shape.equals(selected)) {
-				Rectangle biggerBounds = shape.getBiggerBounds();
-				g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width, biggerBounds.height);
-			}
+			// if (shape.equals(selected)) {
+			// 	Rectangle biggerBounds = shape.getBiggerBounds();
+			// 	g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width, biggerBounds.height);
+			// }
 		}
 
 		if (selectedKnobs != null) {
 			for (Point p : selectedKnobs) {
-				g.drawRect((int) p.getX(), (int) p.getY(), KNOB_SIZE, KNOB_SIZE);
+				g.drawRect((int) (p.getX()-4.5), (int) (p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
 				g.setColor(Color.BLACK);
-				g.fillRect((int) p.getX(), (int) p.getY(), KNOB_SIZE, KNOB_SIZE);
+				g.fillRect((int) (p.getX()-4.5), (int) (p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
 			}
 		}
 
