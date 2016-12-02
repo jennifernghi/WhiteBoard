@@ -429,10 +429,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 			enableTextControlGUI(false);
 		}
 	}
-<<<<<<< HEAD
+
 
 }
-=======
->>>>>>> upstream/master
 
-}
