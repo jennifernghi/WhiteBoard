@@ -113,6 +113,7 @@ public abstract class DShape implements ModelListener {
 	 */
 	public Rectangle getBiggerBounds()
 	{
-		return new Rectangle (this.getBounds().x -2, this.getBounds().y -2, this.getBounds().width + 4, this.getBounds().height+4);
+		return new Rectangle ((int)(this.getBounds().x -4.5), (int)(this.getBounds().y -4.5), 
+			(int)(this.getBounds().width + 9), (int)(this.getBounds().height+9));
 	}
 }
