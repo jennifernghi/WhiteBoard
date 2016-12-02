@@ -6,6 +6,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.awt.Rectangle;
 import java.util.List;
 import java.util.ArrayList;
@@ -27,7 +37,7 @@ public class Canvas extends JPanel {
 	private DShapeModelTable dShapeTableModel;
 	private Point movingPt;
 	private Point anchorPt;
-	private int indexOfMoving; 
+	private int indexOfMoving;
 
 	public Canvas() {
 		showCanvasGUI();
@@ -85,26 +95,27 @@ public class Canvas extends JPanel {
 					DShape shape = shapes.get(i);
 					Rectangle biggerBound = shape.getBiggerBounds();
 
-					
 					if (biggerBound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
-						
-						for (Point p: selectedKnobs){
-							//System.out.println(p.getX()+" "+p.getY());
-							Rectangle knobBound = new Rectangle((int)(p.getX()-4.5), (int)(p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
-							if (knobBound.contains(x,y)){
-								//System.out.println("hi this works");
+
+						for (Point p : selectedKnobs) {
+							// System.out.println(p.getX()+" "+p.getY());
+							Rectangle knobBound = new Rectangle((int) (p.getX() - 4.5), (int) (p.getY() - 4.5),
+									KNOB_SIZE, KNOB_SIZE);
+							if (knobBound.contains(x, y)) {
+								// System.out.println("hi this works");
 
 								movingPt = p;
 
-								//find anchor point
+								// find anchor point
 								indexOfMoving = selectedKnobs.indexOf(movingPt);
-								anchorPt = selectedKnobs.get((indexOfMoving+2)%4);
-								//System.out.println(((index+2)%4)+" "+index+" "+anchorPt.getX() +" "+anchorPt.getY());
+								anchorPt = selectedKnobs.get((indexOfMoving + 2) % 4);
+								// System.out.println(((index+2)%4)+" "+index+"
+								// "+anchorPt.getX() +" "+anchorPt.getY());
 
 								break;
-							}else{
-								movingPt =null;
+							} else {
+								movingPt = null;
 							}
 						}
 						setSelected(shape);
@@ -113,7 +124,7 @@ public class Canvas extends JPanel {
 						selectedKnobs.clear();
 						setSelected(null);
 					}
-					
+
 				}
 			}
 		});
@@ -124,48 +135,44 @@ public class Canvas extends JPanel {
 			public void mouseDragged(MouseEvent e) {
 				// only this method needed
 
-				if(selected !=null){
+				if (selected != null) {
 
-					if (movingPt != null ){
-						movingPt= new Point(e.getX(), e.getY());
-						Rectangle newBound; 
-						//when moving knob is upper left
-						if(indexOfMoving ==0){
-							newBound = new Rectangle((int)movingPt.getX(), 
-														(int)movingPt.getY(), 
-														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
-														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
-						}
-						else if (indexOfMoving ==1){
-							//when moving knob is upper right
-							newBound = new Rectangle((int)(movingPt.getX()-(int)Math.abs(anchorPt.getX()-movingPt.getX())), 
-														(int)movingPt.getY(), 
-														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
-														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
-						}
-						else  if (indexOfMoving ==2){
-							//when moving knob is lower right
-							newBound = new Rectangle((int)(movingPt.getX() -(int)Math.abs(anchorPt.getX()-movingPt.getX())), 
-														(int)(movingPt.getY()-(int)Math.abs(anchorPt.getY()-movingPt.getY()) ) , 
-														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
-														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
-						}
-						else{
-							//when moving knob is lower left
-							newBound = new Rectangle((int)movingPt.getX(), 
-														(int)(movingPt.getY()-(int)Math.abs(anchorPt.getY()-movingPt.getY())), 
-														(int)Math.abs(anchorPt.getX()-movingPt.getX()), 
-														(int)Math.abs(anchorPt.getY()-movingPt.getY()));
-						
-						}
-						
-						selected.getdShapeModel().setX((int)newBound.getX());
-						selected.getdShapeModel().setY((int)newBound.getY());
-						selected.getdShapeModel().setWidth((int)newBound.getWidth());
-						selected.getdShapeModel().setHeight((int)newBound.getHeight());
+					if (movingPt != null) {
+						movingPt = new Point(e.getX(), e.getY());
+						Rectangle newBound;
+						// when moving knob is upper left
+						if (indexOfMoving == 0) {
+							newBound = new Rectangle((int) movingPt.getX(), (int) movingPt.getY(),
+									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
+									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
+						} else if (indexOfMoving == 1) {
+							// when moving knob is upper right
+							newBound = new Rectangle(
+									(int) (movingPt.getX() - (int) Math.abs(anchorPt.getX() - movingPt.getX())),
+									(int) movingPt.getY(), (int) Math.abs(anchorPt.getX() - movingPt.getX()),
+									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
+						} else if (indexOfMoving == 2) {
+							// when moving knob is lower right
+							newBound = new Rectangle(
+									(int) (movingPt.getX() - (int) Math.abs(anchorPt.getX() - movingPt.getX())),
+									(int) (movingPt.getY() - (int) Math.abs(anchorPt.getY() - movingPt.getY())),
+									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
+									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
+						} else {
+							// when moving knob is lower left
+							newBound = new Rectangle((int) movingPt.getX(),
+									(int) (movingPt.getY() - (int) Math.abs(anchorPt.getY() - movingPt.getY())),
+									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
+									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 
+						}
 
-					}else {
+						selected.getdShapeModel().setX((int) newBound.getX());
+						selected.getdShapeModel().setY((int) newBound.getY());
+						selected.getdShapeModel().setWidth((int) newBound.getWidth());
+						selected.getdShapeModel().setHeight((int) newBound.getHeight());
+
+					} else {
 						DShapeModel selectedModel = selected.getdShapeModel();
 
 						int x = e.getX();
@@ -175,10 +182,10 @@ public class Canvas extends JPanel {
 						selectedModel.setY(y);
 					}
 
-				selectedKnobs = selected.getKnobs();
+					selectedKnobs = selected.getKnobs();
 
+				}
 			}
-		}
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -212,16 +219,17 @@ public class Canvas extends JPanel {
 			// loop through all the shapes and draw them
 			shape.draw(g);
 			// if (shape.equals(selected)) {
-			// 	Rectangle biggerBounds = shape.getBiggerBounds();
-			// 	g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width, biggerBounds.height);
+			// Rectangle biggerBounds = shape.getBiggerBounds();
+			// g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width,
+			// biggerBounds.height);
 			// }
 		}
 
 		if (selectedKnobs != null) {
 			for (Point p : selectedKnobs) {
-				g.drawRect((int) (p.getX()-4.5), (int) (p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
+				g.drawRect((int) (p.getX() - 4.5), (int) (p.getY() - 4.5), KNOB_SIZE, KNOB_SIZE);
 				g.setColor(Color.BLACK);
-				g.fillRect((int) (p.getX()-4.5), (int) (p.getY()-4.5), KNOB_SIZE, KNOB_SIZE);
+				g.fillRect((int) (p.getX() - 4.5), (int) (p.getY() - 4.5), KNOB_SIZE, KNOB_SIZE);
 			}
 		}
 
@@ -324,6 +332,71 @@ public class Canvas extends JPanel {
 		shapes.add(0, selected);
 		repaint();
 		dShapeTableModel.fireTableDataChanged();
+
+	}
+	/**
+	 * save into xml file
+	 * @param file
+	 * @throws FileNotFoundException
+	 */
+	public void save(File file) throws FileNotFoundException {
+		setSelected(null);
+		selectedKnobs.clear();
+		XMLEncoder xmlOut = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)));
+		DShapeModel[] models = new DShapeModel[getShapes().size()];
+		for (int i = 0; i < getShapes().size(); i++) {
+			models[i] = getShapes().get(i).getdShapeModel();
+		}
+
+		xmlOut.writeObject(models);
+		xmlOut.flush();
+		xmlOut.close();
+
+	}
+	/**
+	 * open xml file
+	 * @param file
+	 * @throws FileNotFoundException
+	 */
+	public void open(File file) throws FileNotFoundException {
+		XMLDecoder xmlIn = new XMLDecoder(new BufferedInputStream(new FileInputStream(file)));
+		DShapeModel[] models = (DShapeModel[]) xmlIn.readObject();
+		clear();
+		for (DShapeModel dShapeModel : models) {
+			addShape(dShapeModel);
+		}
+		dShapeTableModel.fireTableDataChanged();
+		setSelected(null);
+		xmlIn.close();
+
+	}
+	/**
+	 * clear shaps, selectedKnobs and update dShapeModel
+	 */
+	private void clear() {
+		shapes.clear();
+		selectedKnobs.clear();
+		dShapeTableModel.fireTableDataChanged();
+		repaint();
+	}
+	/**
+	 * save PNG image
+	 * @param file
+	 */
+	public void saveImage(File file) {
+		selected = null;
+		selectedKnobs.clear();
+
+		repaint();
+		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+		paint(image.getGraphics());
+
+		try {
+			javax.imageio.ImageIO.write(image, "PNG", file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 }

@@ -41,7 +41,7 @@ public class DText extends DShape {
 				while (fontMetrics.getHeight() <= this.getHeight())
 				{
 					previous = size;
-					size = (size * 1.10) + 1;
+					size = (size * 1.0) + 1;
 					Font newSizeFont = font.deriveFont((float)size);
 					fontMetrics = new FontMetrics(newSizeFont) {};
 				}

@@ -17,7 +17,7 @@ public class DLineModel extends DShapeModel {
 	public DLineModel() {
 		p1 = new Point();
 		p2= new Point();
-		setAnchorPoint(p1);
+		//setAnchorPoint(p1);
 	}
 	/**
 	 * set P1
@@ -90,12 +90,11 @@ public class DLineModel extends DShapeModel {
 	 * @param width  
 	 */
 	public void setWidth(int width) {
-		if (super.getAnchorPoint()==p1){
+		
 			p2.x = p1.x + width;
-		}
-		else{
+		
 			p1.x = p2.x + width;
-		}
+		
 		setBounds();
 	}
 	
@@ -105,12 +104,11 @@ public class DLineModel extends DShapeModel {
 	 * @param height  
 	 */
 	public void setHeight(int height) {
-		if (super.getAnchorPoint()==p1){
+		
 			p2.y = p1.y + height;
-		}
-		else{
+	
 			p1.y = p2.y + height;
-		}
+		
 		setBounds();
 	}
 	

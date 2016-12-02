@@ -3,6 +3,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -11,6 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -18,7 +22,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class WhiteBoard extends JFrame implements ModelListener {
-
+	public static final String NORMAL = "normal";
+	public static final String SERVER = "server";
+	public static final String CLIENT = "client";
 	private Canvas canvas;
 
 	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
@@ -30,9 +36,11 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private JTextField textField;
 	// private Canvas canvas;
 	private JTable table;
+	private File file;
+	private String status;
 
 	public WhiteBoard() {
-
+		this.status = NORMAL;
 		showWhiteBoardGUI();
 	}
 
@@ -99,8 +107,8 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private Box showNetWorkBox() {
 
 		Box netWorkBox = Box.createHorizontalBox();
-
-		networkStatus = new JLabel("Status:");
+		JLabel label = new JLabel("Status: ");
+		networkStatus = new JLabel(status);
 
 		serverStartButton = new JButton("Start Server");
 		serverStartButton.addActionListener(e -> serverStart());
@@ -109,6 +117,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 		netWorkBox.add(serverStartButton);
 		netWorkBox.add(clientStartButton);
+		netWorkBox.add(label);
 		netWorkBox.add(networkStatus);
 		return netWorkBox;
 	}
@@ -226,11 +235,11 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle setColor
 	 */
 	private void setColor() {
-		if(canvas.getSelected()==null){
+		if (canvas.getSelected() == null) {
 			return;
-		}else{
+		} else {
 			DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
-	
+
 			Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor());
 			shapeModel.setColor(newColor);
 		}
@@ -274,21 +283,46 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle saveImage
 	 */
 	private void saveImage() {
+		file = new File(JOptionPane.showInputDialog("PNG File Name: ") + ".png");
+		if (file != null) {
 
+			canvas.saveImage(file);
+
+		}
 	}
 
 	/**
 	 * handle open
 	 */
 	private void open() {
-
+		if (status.equals(NORMAL)) {
+			file = new File(JOptionPane.showInputDialog("File Name: "));
+			if (file != null) {
+				try {
+					canvas.open(file);
+					registerViewListener();
+				} catch (FileNotFoundException e) {
+					JOptionPane.showMessageDialog(this, "File Not Found");
+				}
+			}
+		} else {
+			return;
+		}
 	}
 
 	/**
 	 * handle save
 	 */
 	private void save() {
+		file = new File(JOptionPane.showInputDialog("File Name: "));
+		if (file != null) {
+			try {
+				canvas.save(file);
+			} catch (FileNotFoundException e) {
+				JOptionPane.showMessageDialog(this, "File Not Found");
+			}
 
+		}
 	}
 
 	/**
@@ -302,9 +336,9 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle move Back
 	 */
 	private void moveBack() {
-		if(canvas.getSelected()==null){
+		if (canvas.getSelected() == null) {
 			return;
-		}else{
+		} else {
 			canvas.moveBack(canvas.getSelected());
 		}
 	}
@@ -313,9 +347,9 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle move Front
 	 */
 	private void moveFront() {
-		if(canvas.getSelected()==null){
+		if (canvas.getSelected() == null) {
 			return;
-		}else{
+		} else {
 			canvas.moveFront(canvas.getSelected());
 		}
 	}
@@ -344,7 +378,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		// initial shape
 		defaultShape(dShapemodel);
 
-		// register the view WhiteBoard to listener
+		// Whiteboard listens to changes of shape
 		dShapemodel.addModelListener(this);
 
 		// create correct shape using addShape() on canvas
@@ -420,16 +454,26 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		if (model instanceof DTextModel) {
 			DTextModel dTextModel = (DTextModel) model;
 			enableTextControlGUI(true); // enable textField and JCombobox
-			
-			//update textField and JCombobox with selected text shape' text and font name
+
+			// update textField and JCombobox with selected text shape' text and
+			// font name
 			setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());
 
 		} else {
+
 			// disable textField & JCombobox
 			enableTextControlGUI(false);
+
 		}
 	}
 
-
+	/**
+	 * after open a file, lets whiteboard listens to changes of shapes
+	 */
+	private void registerViewListener() {
+		List<DShape> shapes = canvas.getShapes();
+		for (DShape shape : shapes) {
+			shape.getdShapeModel().addModelListener(this);
+		}
+	}
 }
-
