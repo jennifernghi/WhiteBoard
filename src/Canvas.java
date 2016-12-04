@@ -38,6 +38,8 @@ public class Canvas extends JPanel {
 	private Point movingPt;
 	private Point anchorPt;
 	private int indexOfMoving;
+	private int selectedX;
+	private int selectedY;
 
 	public Canvas() {
 		showCanvasGUI();
@@ -75,8 +77,8 @@ public class Canvas extends JPanel {
 	}
 
 	private void initializeMouseEvent() {
-		this.addMouseListener(new MouseAdapter() {
 
+		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO call getBound and get rect boundary. ask if it is a
@@ -88,8 +90,8 @@ public class Canvas extends JPanel {
 				// if at the end all is not within bound, then quit
 				// System.out.println("hi this is happening");
 
-				int x = e.getX();
-				int y = e.getY();
+				 int x = e.getX();
+				 int y = e.getY();
 
 				for (int i = shapes.size() - 1; i >= 0; i--) {
 					DShape shape = shapes.get(i);
@@ -97,9 +99,13 @@ public class Canvas extends JPanel {
 
 					if (biggerBound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
+						selectedX = x;
+						selectedY = y;
 
 						for (Point p : selectedKnobs) {
-							// System.out.println(p.getX()+" "+p.getY());
+							 
+							 System.out.println(p.getX()+" "+p.getY());
+
 							Rectangle knobBound = new Rectangle((int) (p.getX() - 4.5), (int) (p.getY() - 4.5),
 									KNOB_SIZE, KNOB_SIZE);
 							if (knobBound.contains(x, y)) {
@@ -178,8 +184,34 @@ public class Canvas extends JPanel {
 						int x = e.getX();
 						int y = e.getY();
 
-						selectedModel.setX(x);
-						selectedModel.setY(y);
+						int xGap = selectedX-x;
+						int yGap = selectedY-y;
+
+						selectedX = x-xGap;
+						selectedY = y-yGap;
+
+
+						//int yGap = (int)e.getY()-selectedY;
+						//System.out.println("ygap" +yGap);
+
+						//int xGap= selectedModel.getWidth()-x;
+						//int yGap = selectedModel.getHeight()-y;
+
+
+						//System.out.println(selectedModel.getX()+x);
+						//System.out.println(selectedModel.getY()+y);
+
+
+						//not setting the xy but need the width and height and add on to it
+
+						selectedModel.setX(selectedModel.getX()-xGap);
+						selectedModel.setY(selectedModel.getY()-yGap);
+
+
+
+
+
+
 					}
 
 					selectedKnobs = selected.getKnobs();
