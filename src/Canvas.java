@@ -298,7 +298,20 @@ public class Canvas extends JPanel {
 		dShapeTableModel.fireTableDataChanged();
 
 	}
-
+	
+	public DShape getShape(int id) {
+		DShape dShape = null;
+		for(DShape shape: shapes){
+			DShapeModel dShapeModel = shape.getdShapeModel();
+			if(dShapeModel.getID()==id){
+				dShape= shape;
+			}
+		}
+		if(dShape==null){
+			System.err.println("not found!");
+		}
+		return dShape;
+	}
 	public void deleteShape() {
 		if (selected != null) {
 			// TODO Remove from list, WhiteBoard listeners and dShape listeners,
