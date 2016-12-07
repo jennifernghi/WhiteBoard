@@ -1,12 +1,21 @@
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -21,10 +30,22 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+
+
 public class WhiteBoard extends JFrame implements ModelListener {
 	public static final String NORMAL = "normal";
 	public static final String SERVER = "server";
 	public static final String CLIENT = "client";
+	public static final String ADD = "add";
+	public static final String REMOVE = "remove";
+	public static final String FRONT = "front";
+	public static final String BACK = "back";
+	public static final String CHANGE = "change";
+	public static final String IP = "127.0.0.1";
+	public static final int PORT = 32122;
+	private int defaultId =0;
+	   // List of object streams to which we send data
+    private List<ObjectOutputStream> outputs = new ArrayList<ObjectOutputStream>();
 	private Canvas canvas;
 
 	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
@@ -235,31 +256,43 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle setColor
 	 */
 	private void setColor() {
-		if (canvas.getSelected() == null) {
-			return;
-		} else {
-			DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
+		if(status.equals(NORMAL)||status.equals(SERVER)){
+			if (canvas.getSelected() == null) {
+				return;
+			} else {
+				DShapeModel shapeModel = canvas.getSelected().getdShapeModel();
+	
+				Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor());
+				shapeModel.setColor(newColor);
+			}
 
-			Color newColor = JColorChooser.showDialog(colorChooser, "Color Picker", shapeModel.getColor());
-			shapeModel.setColor(newColor);
+		}else{
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
 		}
-
 	}
 
 	/**
 	 * handle add text
 	 */
 	private void addText() {
-		DShapeModel text = new DTextModel();
-		addShape(text);
+		if(status.equals(NORMAL)||status.equals(SERVER)){
+			DShapeModel text = new DTextModel();
+			addShape(text);
+		}else{
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
 	 * handle add line
 	 */
 	private void addLine() {
-		DShapeModel line = new DLineModel();
-		addShape(line);
+		if(status.equals(NORMAL)||status.equals(SERVER)){
+			DShapeModel line = new DLineModel();
+			addShape(line);
+		}else{
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 
 	}
 
@@ -267,16 +300,24 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle add oval
 	 */
 	private void addOval() {
-		DShapeModel oval = new DOvalModel();
-		addShape(oval);
+		if(status.equals(NORMAL)||status.equals(SERVER)){
+			DShapeModel oval = new DOvalModel();
+			addShape(oval);
+		}else{
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
 	 * handle add rect
 	 */
 	private void addRect() {
-		DShapeModel rectangle = new DRectModel();
-		addShape(rectangle);
+		if(status.equals(NORMAL)||status.equals(SERVER)){
+			DShapeModel rectangle = new DRectModel();
+			addShape(rectangle);
+		}else{
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
@@ -297,6 +338,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private void open() {
 		if (status.equals(NORMAL)) {
 			file = new File(JOptionPane.showInputDialog("File Name: "));
+			
 			if (file != null) {
 				try {
 					canvas.open(file);
@@ -306,7 +348,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 				}
 			}
 		} else {
-			return;
+			JOptionPane.showMessageDialog(this,"this feature is unavailable in " + status +" mode");
 		}
 	}
 
@@ -319,7 +361,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 			try {
 				canvas.save(file);
 			} catch (FileNotFoundException e) {
-				JOptionPane.showMessageDialog(this, "File Not Found");
+				JOptionPane.showMessageDialog(this,"No file entered");
 			}
 
 		}
@@ -358,14 +400,48 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle client-side networking
 	 */
 	private void clientStart() {
-
+		if(status.equals(SERVER)){
+			int input = JOptionPane.showConfirmDialog(this, "program is on server mode, can't switch to client. Do you want to quit?");
+			if(input==JOptionPane.YES_OPTION){
+				System.exit(0);
+			}
+			
+		}else if(status.equals(CLIENT)){
+			JOptionPane.showMessageDialog(this, "Program already connect to "+ IP+":"+PORT);
+		}else{
+			String address = JOptionPane.showInputDialog("Connect to", IP+":"+PORT);
+			System.out.println(address);
+			setStatus(CLIENT);
+			networkStatus.setText(status);
+			ClientHandler client = new ClientHandler(IP, PORT);
+			client.start();
+		}
 	}
 
 	/**
 	 * handle server-side networking
 	 */
 	private void serverStart() {
-
+		if(status.equals(CLIENT)){
+			int input = JOptionPane.showConfirmDialog(this, "program is on client mode, can't switch to server. Do you want to quit?");
+			if(input==JOptionPane.YES_OPTION){
+				System.exit(0);
+			}else{
+				return;
+			}
+		}else if(status.equals(SERVER)){
+			JOptionPane.showMessageDialog(this, "You are already in server mode");
+		}else{
+			String port = JOptionPane.showInputDialog("Port Number:", PORT);
+			if(Integer.parseInt(port.trim())<0 || Integer.parseInt(port.trim())>65535){
+				JOptionPane.showMessageDialog(this, "available port: 0 - 65535");
+			}else{
+				setStatus(SERVER);
+				networkStatus.setText(status);
+				ServerAccepter server = new ServerAccepter(PORT);
+				server.start();
+		}
+		}
 	}
 
 	/**
@@ -377,7 +453,8 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private void addShape(DShapeModel dShapemodel) {
 		// initial shape
 		defaultShape(dShapemodel);
-
+		//sent to client if server/client available
+		sentToClient(ADD, dShapemodel);
 		// Whiteboard listens to changes of shape
 		dShapemodel.addModelListener(this);
 
@@ -391,6 +468,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * @param dShapemodel
 	 */
 	private void defaultShape(DShapeModel dShapemodel) {
+		dShapemodel.setID(++defaultId);
 		dShapemodel.setX(10);
 		dShapemodel.setY(10);
 		dShapemodel.setWidth(20);
@@ -438,7 +516,8 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	}
 
 	public static void main(String[] args) {
-		WhiteBoard whiteBoard = new WhiteBoard();
+		 new WhiteBoard();
+		new WhiteBoard();
 
 	}
 
@@ -475,5 +554,102 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		for (DShape shape : shapes) {
 			shape.getdShapeModel().addModelListener(this);
 		}
+	}
+	
+	public void setStatus(String status) {
+		this.status=status;
+	}
+	
+	// Server thread accepts incoming client connections
+    class ServerAccepter extends Thread {
+        private int port;
+        ServerAccepter(int port) {
+            this.port = port;
+        }
+        public void run() {
+            try {
+                ServerSocket serverSocket = new ServerSocket(port);
+                while (true) {
+                    Socket toClient = null;
+                    // this blocks, waiting for a Socket to the client
+                    toClient = serverSocket.accept();
+                   
+                    // Get an output stream to the client, and add it to
+                    // the list of outputs
+                    // (our server only uses the output stream of the connection)
+                    addOutput(new ObjectOutputStream(toClient.getOutputStream()));
+                    
+               
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace(); 
+            }
+        }
+		
+		
+    }
+    
+    
+     class ClientHandler extends Thread {
+        private String name;
+        private int port;
+        ClientHandler(String name, int port) {
+            this.name = name;
+            this.port = port;
+        }
+    
+        public void run() {
+            try {
+                // make connection to the server name/port
+                Socket toServer = new Socket(name, port);
+                // get input stream to READ from server and wrap in object input stream
+                ObjectInputStream in = new ObjectInputStream(toServer.getInputStream());
+                
+                // we could do this if we wanted to write to server in addition
+                // to reading
+                // out = new ObjectOutputStream(toServer.getOutputStream());
+                while (true) {
+                    // Get the xml string, decode to a Message object.
+                    // Blocks in readObject(), waiting for server to send something.
+                    String command = (String) in.readObject();
+                    String dShapeModel = (String) in.readObject();
+                    XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(dShapeModel.getBytes()));
+                    DShapeModel model = (DShapeModel) decoder.readObject();
+                    decoder.close();
+                    
+                    if(command.equals(ADD)){
+                    	canvas.addShape(model);
+                    	canvas.setSelected(null);
+                    }
+                   
+
+                }
+            }
+            catch (Exception ex) { // IOException and ClassNotFoundException
+               ex.printStackTrace();
+            }
+            
+            
+       }
+   }
+    private void sentToClient(String command, DShapeModel dShapeModel) {
+		for(ObjectOutputStream out: outputs ){
+			try {
+				out.writeObject(command);
+				OutputStream memStream = new ByteArrayOutputStream();
+				XMLEncoder encoder = new XMLEncoder(memStream);
+				encoder.writeObject(dShapeModel);
+				encoder.close();
+				String xmlString = memStream.toString();
+				out.writeObject(xmlString);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+    private synchronized void addOutput(ObjectOutputStream objectOutputStream) {
+		outputs.add(objectOutputStream);
 	}
 }

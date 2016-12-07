@@ -10,11 +10,20 @@ public abstract class DShapeModel {
 	private Rectangle conceptualBound; 
 	private Color color;
 	private ArrayList<ModelListener> listeners = new ArrayList<>();
+	private int id;
 
 	public DShapeModel() {
 		conceptualBound = new Rectangle(0, 0, 0, 0);
 		this.color = Color.GRAY;
 	}
+
+	public int getID() {
+ 		return this.id;
+ 	}
+ 	
+ 	public void setID(int id) {
+ 		this.id=id;
+ 	}
 	/*
 	 * set X of conceptual bound
 	 * @param x int
