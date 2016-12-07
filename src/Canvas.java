@@ -119,7 +119,11 @@ public class Canvas extends JPanel {
 
 								// find anchor point
 								indexOfMoving = selectedKnobs.indexOf(movingPt);
-								anchorPt = selectedKnobs.get((indexOfMoving + 2) % 4);
+
+								if(shape instanceof DLine)
+									anchorPt = selectedKnobs.get((indexOfMoving+1)%2);
+								else
+									anchorPt = selectedKnobs.get((indexOfMoving + 2) % 4);
 								// System.out.println(((index+2)%4)+" "+index+"
 								// "+anchorPt.getX() +" "+anchorPt.getY());
 
@@ -149,15 +153,19 @@ public class Canvas extends JPanel {
 
 					if (movingPt != null) {
 						movingPt = new Point(e.getX(), e.getY());
+
+						//System.out.println(indexOfMoving);
 						Rectangle newBound;
 						// when moving knob is upper left
 						if (indexOfMoving == 0) {
-							newBound = new Rectangle(
+								newBound = new Rectangle(
 									(int) movingPt.getX(), 
 									(int) movingPt.getY(),
 									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
-						} else if (indexOfMoving == 1) {
+							
+						}
+						 else if (indexOfMoving == 1) {
 							// when moving knob is upper right
 							newBound = new Rectangle(
 									(int) (movingPt.getX() - (int) Math.abs(anchorPt.getX() - movingPt.getX())),
@@ -182,6 +190,7 @@ public class Canvas extends JPanel {
 						}
 
 						//if the shape is flipped horizontal
+						
 						if (newBound.getWidth() ==0){
 							if (indexOfMoving ==2) 
 								indexOfMoving = 3;
@@ -204,6 +213,9 @@ public class Canvas extends JPanel {
 							else
 								indexOfMoving =2;
 						}
+					
+
+					
 
 
 						selected.getdShapeModel().setX((int) newBound.getX());
@@ -211,7 +223,10 @@ public class Canvas extends JPanel {
 						selected.getdShapeModel().setWidth((int) newBound.getWidth());
 						selected.getdShapeModel().setHeight((int) newBound.getHeight());
 						selectedKnobs = selected.getKnobs();
-						anchorPt =selectedKnobs.get((indexOfMoving + 2) % 4);
+						if(!(selected instanceof DLine))
+							anchorPt =selectedKnobs.get((indexOfMoving + 2) % 4);
+					
+											
 
 					} else {
 						DShapeModel selectedModel = selected.getdShapeModel();
@@ -227,11 +242,6 @@ public class Canvas extends JPanel {
 
 						selectedX = x;
 						selectedY = y; 
-
-
-						//int xmoved = (originalX+e.getX())- (originalX+selectedX);
-						//int ymoved = (originalY+e.getY())- (originalY+selectedY);
-
 
 						selectedModel.setX(originalX+xmoved);
 						selectedModel.setY(originalY+ymoved);

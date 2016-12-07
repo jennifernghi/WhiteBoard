@@ -91,9 +91,11 @@ public class DLineModel extends DShapeModel {
 	 */
 	public void setWidth(int width) {
 		
-			p2.x = p1.x + width;
+			if(width ==0)
+				p1.x = p2.x + width;
+			else
+				p2.x = p1.x + width;
 		
-			p1.x = p2.x + width;
 		
 		setBounds();
 	}
@@ -105,9 +107,12 @@ public class DLineModel extends DShapeModel {
 	 */
 	public void setHeight(int height) {
 		
-			p2.y = p1.y + height;
-	
-			p1.y = p2.y + height;
+			
+			if(height==0)
+				p1.y = p2.y + height;
+			else
+				p2.y = p1.y + height;
+
 		
 		setBounds();
 	}
