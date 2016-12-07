@@ -16,14 +16,14 @@ public abstract class DShapeModel {
 		conceptualBound = new Rectangle(0, 0, 0, 0);
 		this.color = Color.GRAY;
 	}
-
+	
 	public int getID() {
- 		return this.id;
- 	}
- 	
- 	public void setID(int id) {
- 		this.id=id;
- 	}
+		return this.id;
+	}
+	
+	public void setID(int id) {
+		this.id=id;
+	}
 	/*
 	 * set X of conceptual bound
 	 * @param x int

@@ -90,12 +90,8 @@ public class Canvas extends JPanel {
 				// if at the end all is not within bound, then quit
 				// System.out.println("hi this is happening");
 
-				 selectedX = e.getX();
-				 selectedY= e.getY();
-
 				 int x = e.getX();
 				 int y = e.getY();
-
 
 				for (int i = shapes.size() - 1; i >= 0; i--) {
 					DShape shape = shapes.get(i);
@@ -103,12 +99,12 @@ public class Canvas extends JPanel {
 
 					if (biggerBound.contains(x, y)) {
 						selectedKnobs = shape.getKnobs();
-						//selectedX = x;
-						//selectedY = y;
+						selectedX = x;
+						selectedY = y;
 
 						for (Point p : selectedKnobs) {
 							 
-							 //System.out.println(p.getX()+" "+p.getY());
+							 System.out.println(p.getX()+" "+p.getY());
 
 							Rectangle knobBound = new Rectangle((int) (p.getX() - 4.5), (int) (p.getY() - 4.5),
 									KNOB_SIZE, KNOB_SIZE);
@@ -152,17 +148,14 @@ public class Canvas extends JPanel {
 						Rectangle newBound;
 						// when moving knob is upper left
 						if (indexOfMoving == 0) {
-							newBound = new Rectangle(
-									(int) movingPt.getX(), 
-									(int) movingPt.getY(),
+							newBound = new Rectangle((int) movingPt.getX(), (int) movingPt.getY(),
 									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 						} else if (indexOfMoving == 1) {
 							// when moving knob is upper right
 							newBound = new Rectangle(
 									(int) (movingPt.getX() - (int) Math.abs(anchorPt.getX() - movingPt.getX())),
-									(int) movingPt.getY(), 
-									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
+									(int) movingPt.getY(), (int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 						} else if (indexOfMoving == 2) {
 							// when moving knob is lower right
@@ -173,70 +166,50 @@ public class Canvas extends JPanel {
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 						} else {
 							// when moving knob is lower left
-							newBound = new Rectangle(
-									(int) movingPt.getX(),
+							newBound = new Rectangle((int) movingPt.getX(),
 									(int) (movingPt.getY() - (int) Math.abs(anchorPt.getY() - movingPt.getY())),
 									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 
 						}
 
-						//if the shape is flipped horizontal
-						if (newBound.getWidth() ==0){
-							if (indexOfMoving ==2) 
-								indexOfMoving = 3;
-							else if (indexOfMoving ==3)
-								indexOfMoving = 2;
-							else if (indexOfMoving ==0)
-								indexOfMoving =1;
-							else
-								indexOfMoving =0;
-						}
-
-						//if the shape is flipped vertical
-						if (newBound.getHeight() == 0){
-							if(indexOfMoving==2)
-								indexOfMoving = 1;
-							else if (indexOfMoving ==3)
-								indexOfMoving =0;
-							else if(indexOfMoving ==0)
-								indexOfMoving =3;
-							else
-								indexOfMoving =2;
-						}
-
-
 						selected.getdShapeModel().setX((int) newBound.getX());
 						selected.getdShapeModel().setY((int) newBound.getY());
 						selected.getdShapeModel().setWidth((int) newBound.getWidth());
 						selected.getdShapeModel().setHeight((int) newBound.getHeight());
-						selectedKnobs = selected.getKnobs();
-						anchorPt =selectedKnobs.get((indexOfMoving + 2) % 4);
 
 					} else {
 						DShapeModel selectedModel = selected.getdShapeModel();
-					
-						int originalX = selectedModel.getX();
-						int originalY = selectedModel.getY();
 
-						int x = e.getX(); //getting the current point
+						int x = e.getX();
 						int y = e.getY();
 
-						int xmoved = x-selectedX;
-						int ymoved = y-selectedY;
+						int xGap = selectedX-x;
+						int yGap = selectedY-y;
 
-						selectedX = x;
-						selectedY = y; 
-
-
-						//int xmoved = (originalX+e.getX())- (originalX+selectedX);
-						//int ymoved = (originalY+e.getY())- (originalY+selectedY);
+						selectedX = x-xGap;
+						selectedY = y-yGap;
 
 
-						selectedModel.setX(originalX+xmoved);
-						selectedModel.setY(originalY+ymoved);
+						//int yGap = (int)e.getY()-selectedY;
+						//System.out.println("ygap" +yGap);
 
-						
+						//int xGap= selectedModel.getWidth()-x;
+						//int yGap = selectedModel.getHeight()-y;
+
+
+						//System.out.println(selectedModel.getX()+x);
+						//System.out.println(selectedModel.getY()+y);
+
+
+						//not setting the xy but need the width and height and add on to it
+
+						selectedModel.setX(selectedModel.getX()-xGap);
+						selectedModel.setY(selectedModel.getY()-yGap);
+
+
+
+
 
 
 					}
@@ -325,21 +298,20 @@ public class Canvas extends JPanel {
 		dShapeTableModel.fireTableDataChanged();
 
 	}
-
+	
 	public DShape getShape(int id) {
- 		DShape dShape = null;
- 		for(DShape shape: shapes){
- 			DShapeModel dShapeModel = shape.getdShapeModel();
- 			if(dShapeModel.getID()==id){
- 				dShape= shape;
- 			}
- 		}
- 		if(dShape==null){
- 			System.err.println("not found!");
- 		}
- 		return dShape;
- 	}
-
+		DShape dShape = null;
+		for(DShape shape: shapes){
+			DShapeModel dShapeModel = shape.getdShapeModel();
+			if(dShapeModel.getID()==id){
+				dShape= shape;
+			}
+		}
+		if(dShape==null){
+			System.err.println("not found!");
+		}
+		return dShape;
+	}
 	public void deleteShape() {
 		if (selected != null) {
 			// TODO Remove from list, WhiteBoard listeners and dShape listeners,
