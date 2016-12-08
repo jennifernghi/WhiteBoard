@@ -3,11 +3,12 @@ import javax.swing.table.AbstractTableModel;
 public class DShapeModelTable extends AbstractTableModel implements ModelListener {
 
 	private Canvas canvas;
-	public static final int COLUMNS = 4;
-	public static final int X_COLUMN = 0;
-	public static final int Y_COLUMN = 1;
-	public static final int WIDTH_COLUMN = 2;
-	public static final int HEIGHT_COLUMN = 3;
+	public static final int COLUMNS = 5;
+	public static final int ID_COLUMN = 0;
+	public static final int X_COLUMN = 1;
+	public static final int Y_COLUMN = 2;
+	public static final int WIDTH_COLUMN = 3;
+	public static final int HEIGHT_COLUMN = 4;
 
 	public DShapeModelTable() {
 		canvas = null;
@@ -17,6 +18,14 @@ public class DShapeModelTable extends AbstractTableModel implements ModelListene
 		this.canvas = canvas;
 	}
 
+	public int getRowIndex(DShapeModel model){
+		for(int i=0; i<canvas.getShapes().size();i++){
+			if (canvas.getShapes().get(i).getdShapeModel() == model) {
+				return i;
+			}
+		}
+		return -1;
+	}
 	@Override
 	public int getRowCount() {
 		if (canvas != null) {
@@ -44,8 +53,10 @@ public class DShapeModelTable extends AbstractTableModel implements ModelListene
 				return dShapeModel.getY();
 			} else if (columnIndex == WIDTH_COLUMN) {
 				return dShapeModel.getWidth();
-			} else {
+			} else if (columnIndex == HEIGHT_COLUMN){
 				return dShapeModel.getHeight();
+			}else{
+				return dShapeModel.getID();
 			}
 		} else {
 			return null;
@@ -60,8 +71,10 @@ public class DShapeModelTable extends AbstractTableModel implements ModelListene
 			return "y";
 		} else if (column == WIDTH_COLUMN) {
 			return "width";
-		} else {
+		} else if(column == HEIGHT_COLUMN){
 			return "height";
+		}else{
+			return "id";
 		}
 	}
 
@@ -83,5 +96,7 @@ public class DShapeModelTable extends AbstractTableModel implements ModelListene
 		// TODO Auto-generated method stub
 
 	}
+	
+	
 
 }

@@ -80,9 +80,5 @@ public class DText extends DShape {
 			DTextModel dTextModel = (DTextModel)getdShapeModel();
 			return dTextModel.getText();
 		}
-		@Override
-		public void individualChanged(DShapeModel model) {
-			// TODO Auto-generated method stub
-			
-		} 
+		
 }

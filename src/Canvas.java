@@ -30,8 +30,6 @@ public class Canvas extends JPanel {
 	final static int CANVAS_SIZE = 400;
 	final static int KNOB_SIZE = 9;
 	private List<DShape> shapes = new ArrayList<DShape>();
-	private DefaultTableModel table;
-	private Integer[] columnsData = new Integer[4]; // 4 columns
 	private DShape selected;
 	private List<Point> selectedKnobs = new ArrayList<Point>();
 	private DShapeModelTable dShapeTableModel;
@@ -71,7 +69,7 @@ public class Canvas extends JPanel {
 		return selected;
 	}
 
-	public void addShapeToList(DShape shape) {
+	private void addShapeToList(DShape shape) {
 		shapes.add(shape);
 		repaint();
 	}
@@ -137,6 +135,7 @@ public class Canvas extends JPanel {
 					} else {
 						selectedKnobs.clear();
 						setSelected(null);
+						
 					}
 
 				}
@@ -158,20 +157,24 @@ public class Canvas extends JPanel {
 						Rectangle newBound;
 						// when moving knob is upper left
 						if (indexOfMoving == 0) {
+							
 								newBound = new Rectangle(
 									(int) movingPt.getX(), 
 									(int) movingPt.getY(),
 									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
 							
+							
 						}
 						 else if (indexOfMoving == 1) {
+							 
 							// when moving knob is upper right
 							newBound = new Rectangle(
 									(int) (movingPt.getX() - (int) Math.abs(anchorPt.getX() - movingPt.getX())),
 									(int) movingPt.getY(), 
 									(int) Math.abs(anchorPt.getX() - movingPt.getX()),
 									(int) Math.abs(anchorPt.getY() - movingPt.getY()));
+							
 						} else if (indexOfMoving == 2) {
 							// when moving knob is lower right
 							newBound = new Rectangle(
@@ -215,8 +218,7 @@ public class Canvas extends JPanel {
 						}
 					
 
-					
-
+				
 
 						selected.getdShapeModel().setX((int) newBound.getX());
 						selected.getdShapeModel().setY((int) newBound.getY());
@@ -397,7 +399,7 @@ public class Canvas extends JPanel {
 		}
 	}
 
-	public TableModel getTableModel() {
+	public DShapeModelTable getTableModel() {
 		return dShapeTableModel;
 	}
 
@@ -481,4 +483,15 @@ public class Canvas extends JPanel {
 		}
 
 	}
+
+	public void selectRow(int row) {
+		// TODO Auto-generated method stub
+
+		setSelected(getShape((int)dShapeTableModel.getValueAt(row, 0)));
+		selectedKnobs= selected.getKnobs();
+		repaint();
+		
+	}
+	
+	
 }

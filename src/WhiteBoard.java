@@ -54,7 +54,6 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private JColorChooser colorChooser = new JColorChooser();
 	private JComboBox<String> fontChooser;
 	private JTextField textField;
-	// private Canvas canvas;
 	private JTable table;
 	private File file;
 	private String status;
@@ -216,22 +215,26 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	}
 
-	/**
-	 * choose font from JComboBox
-	 */
-	private void chooseFont() {
-		String fontName = (String) fontChooser.getSelectedItem();
-
-		canvas.setFontName(fontName);
-	}
+	
 
 	private JScrollPane showTableGUI() {
 
 		table = new JTable(canvas.getTableModel());
-
+		
+		
 		JScrollPane scrollPane = new JScrollPane(table);
-
+		table.getSelectionModel().addListSelectionListener(e->selectRow(table.getSelectedRow()));
 		return scrollPane;
+	}
+	/*
+	 * handle row selection
+	 */
+	private void selectRow(int row) {
+		
+		if(row>=0){
+			canvas.selectRow(row);
+		}
+		
 	}
 
 	private Box showEditShapeBox() {
@@ -251,6 +254,14 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		return editShapeBox;
 	}
 
+	/**
+	 * choose font from JComboBox
+	 */
+	private void chooseFont() {
+		String fontName = (String) fontChooser.getSelectedItem();
+
+		canvas.setFontName(fontName);
+	}
 	/**
 	 * handle setColor
 	 */
@@ -512,7 +523,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * 
 	 * @param state
 	 */
-	public void enableTextControlGUI(boolean state) {
+	private void enableTextControlGUI(boolean state) {
 		if (state == true) {
 			textField.setEnabled(true);
 			fontChooser.setEnabled(true);
@@ -530,7 +541,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * @param text
 	 * @param fontName
 	 */
-	public void setTextControlGUI(String text, String fontName) {
+	private void setTextControlGUI(String text, String fontName) {
 		// TODO Auto-generated method stub
 		textField.setText(text);
 		fontChooser.setSelectedItem(fontName);
@@ -545,26 +556,34 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	@Override
 	public void modelChanged(DShapeModel model) {
 		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void individualChanged(DShapeModel model) {
-		// if selected is a dtextmodel
-		if (model instanceof DTextModel) {
-			DTextModel dTextModel = (DTextModel) model;
-			enableTextControlGUI(true); // enable textField and JCombobox
+		
+			//if shape is selected in canvas, show corresponding selection on table
+			table.setRowSelectionInterval(canvas.getTableModel().getRowIndex(model), canvas.getTableModel().getRowIndex(model));
+			// if selected is a dtextmodel
+			if (model instanceof DTextModel) {
+				DTextModel dTextModel = (DTextModel) model;
+				enableTextControlGUI(true); // enable textField and JCombobox
 
-			// update textField and JCombobox with selected text shape' text and
-			// font name
-			setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());
+				// update textField and JCombobox with selected text shape' text and
+				// font name
+				setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());
 
-		} else {
+			} else {
 
-			// disable textField & JCombobox
-			enableTextControlGUI(false);
+				// disable textField & JCombobox
+				enableTextControlGUI(false);
 
-		}
+			}
+		
+		
+		
+		
 	}
 
 	/**
@@ -644,6 +663,14 @@ public class WhiteBoard extends JFrame implements ModelListener {
 					if (command.equals(ADD)) {
 						canvas.addShape(model);
 						canvas.setSelected(null);
+					}else if(command.equals(REMOVE)){
+						//canvas.deleteShape();
+					}else if(command.equals(CHANGE)){
+						
+					}else if(command.equals(FRONT)){
+						
+					}else if(command.equals(BACK)){
+						
 					}
 
 				}
@@ -674,5 +701,9 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	private synchronized void addOutput(ObjectOutputStream objectOutputStream) {
 		outputs.add(objectOutputStream);
+	}
+	
+	public JTable getTable(){
+		return this.table;
 	}
 }
