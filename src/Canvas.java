@@ -321,7 +321,7 @@ public class Canvas extends JPanel {
 
 			dShape = new DText();
 		}
-		// register listener on dShapeTableModel
+		// dShapeTableModel listens to the change of the model
 		dShapeModel.addModelListener(dShapeTableModel);
 
 		// set correct dShapeModel for dShape
