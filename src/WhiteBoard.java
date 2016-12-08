@@ -703,7 +703,5 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		outputs.add(objectOutputStream);
 	}
 	
-	public JTable getTable(){
-		return this.table;
-	}
+	
 }
