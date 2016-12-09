@@ -56,7 +56,8 @@ public class DLineModel extends DShapeModel {
 	 */
 	private void setBounds()
 	{
-		Rectangle bound= new Rectangle(Math.min(p1.x, p2.x), Math.min(p1.y,p2.y), Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y));
+		Rectangle bound= new Rectangle(Math.min(p1.x, p2.x), Math.min(p1.y,p2.y), 
+			Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y));
 		super.setBounds(bound);
 	}
 	
@@ -90,11 +91,11 @@ public class DLineModel extends DShapeModel {
 	 * @param width  
 	 */
 	public void setWidth(int width) {
-		
-			if(width ==0)
-				p1.x = p2.x + width;
-			else
-				p2.x = p1.x + width;
+		//why? ?????
+			
+				//p1.x = p2.x + width;
+			
+				//p2.x = p1.x + width;
 		
 		
 		setBounds();
@@ -107,11 +108,9 @@ public class DLineModel extends DShapeModel {
 	 */
 	public void setHeight(int height) {
 		
-			
-			if(height==0)
-				p1.y = p2.y + height;
-			else
-				p2.y = p1.y + height;
+			//System.out.println(height);
+			p1.y = p2.y + height;
+			//p2.y = p1.y + height;
 
 		
 		setBounds();
