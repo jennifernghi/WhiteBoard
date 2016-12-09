@@ -46,6 +46,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	// List of object streams to which we send data
 	private List<ObjectOutputStream> outputs = new ArrayList<ObjectOutputStream>();
 	private Canvas canvas;
+	private WhiteBoard whiteBoardClient; 
 
 	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
 			addOvalButton, addLineButton, addTextButton, setColorButton, moveFrontButton, moveBackButton,
@@ -63,13 +64,18 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		showWhiteBoardGUI();
 	}
 
+	public WhiteBoard(String status){
+ 		this.status = status; 
+ 		showWhiteBoardGUI();
+ 	}
+
 	public Canvas getCanvas() {
 		return this.canvas;
 	}
 
 	private void showWhiteBoardGUI() {
 		// whole whiteboard gui + canvas
-		canvas = new Canvas();
+		canvas = new Canvas(status);
 
 		JFrame frame = new JFrame("WhiteBoard");
 		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -401,50 +407,66 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle remove shapes
 	 */
 	private void removeShape() {
-		canvas.deleteShape();
+		if (status.equals(NORMAL) || status.equals(SERVER)) {
+ 			if (canvas.getSelected()!= null){
+ 			sentToClient(REMOVE, canvas.getSelected().getdShapeModel());
+ 			canvas.deleteShape();
+ 			}
+ 		} else {
+ 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+ 		}
 	}
 
 	/**
 	 * handle move Back
 	 */
 	private void moveBack() {
-		if (canvas.getSelected() == null) {
-			return;
-		} else {
-			canvas.moveBack(canvas.getSelected());
-		}
+		if (status.equals(NORMAL) || status.equals(SERVER)) {
+ 			if (canvas.getSelected() == null) {
+ 				return;
+ 			} else {
+ 				sentToClient(BACK, canvas.getSelected().getdShapeModel());
+ 				canvas.moveBack(canvas.getSelected());
+ 			}
+ 		}else{
+ 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+  		}
 	}
 
 	/**
 	 * handle move Front
 	 */
 	private void moveFront() {
-		if (canvas.getSelected() == null) {
-			return;
-		} else {
-			canvas.moveFront(canvas.getSelected());
-		}
+		if (status.equals(NORMAL) || status.equals(SERVER)) {
+ 			if (canvas.getSelected() == null) {
+ 				return;
+ 			} else {
+ 				sentToClient(FRONT, canvas.getSelected().getdShapeModel());
+ 				canvas.moveFront(canvas.getSelected());
+ 			}
+ 		}else{
+ 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+  		}
 	}
 
 	/**
 	 * handle client-side networking
 	 */
 	private void clientStart() {
-		if (status.equals(SERVER)) {
+		if (status.equals(SERVER)&& whiteBoardClient !=null) {
 			int input = JOptionPane.showConfirmDialog(this,
 					"program is on server mode, can't switch to client. Do you want to quit?");
 			if (input == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
 
-		} else if (status.equals(CLIENT)) {
+		} else if (status.equals(CLIENT)&& whiteBoardClient !=null) {
 			JOptionPane.showMessageDialog(this, "Program already connect to " + IP + ":" + PORT);
 		} else {
 			String address = JOptionPane.showInputDialog("Connect to", IP + ":" + PORT);
 			System.out.println(address);
-			setStatus(CLIENT);
-			networkStatus.setText(status);
 			ClientHandler client = new ClientHandler(IP, PORT);
+			whiteBoardClient = new WhiteBoard(CLIENT);
 			client.start();
 		}
 	}
@@ -469,7 +491,6 @@ public class WhiteBoard extends JFrame implements ModelListener {
 				JOptionPane.showMessageDialog(this, "available port: 0 - 65535");
 			} else {
 				setStatus(SERVER);
-				networkStatus.setText(status);
 				ServerAccepter server = new ServerAccepter(PORT);
 				server.start();
 			}
@@ -549,14 +570,13 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	public static void main(String[] args) {
 		new WhiteBoard();
-		new WhiteBoard();
 
 	}
 
 	@Override
 	public void modelChanged(DShapeModel model) {
 		// TODO Auto-generated method stub
-		
+		sentToClient(CHANGE, model);
 
 	}
 
@@ -598,6 +618,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	public void setStatus(String status) {
 		this.status = status;
+		networkStatus.setText(status);
 	}
 
 	// Server thread accepts incoming client connections
@@ -661,17 +682,19 @@ public class WhiteBoard extends JFrame implements ModelListener {
 					decoder.close();
 
 					if (command.equals(ADD)) {
-						canvas.addShape(model);
-						canvas.setSelected(null);
-					}else if(command.equals(REMOVE)){
-						//canvas.deleteShape();
-					}else if(command.equals(CHANGE)){
-						
-					}else if(command.equals(FRONT)){
-						
-					}else if(command.equals(BACK)){
-						
-					}
+						whiteBoardClient.canvas.addShape(model);
+ 					}else if (command.equals(REMOVE)){
+ 						whiteBoardClient.canvas.deleteShape(model);
+ 					}else if(command.equals(BACK)){
+ 						whiteBoardClient.canvas.moveBack(model); 
+ 					}else if (command.equals(CHANGE)){
+ 						whiteBoardClient.canvas.updateShape(model);
+ 
+ 
+ 					}else if (command.equals(FRONT)){
+ 						whiteBoardClient.canvas.moveFront(model);
+  					}
+  
 
 				}
 			} catch (Exception ex) { // IOException and ClassNotFoundException
