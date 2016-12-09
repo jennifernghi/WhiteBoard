@@ -46,6 +46,16 @@ public class Canvas extends JPanel {
 
 	}
 
+	public Canvas(String status) {
+  		showCanvasGUI();
+  		initializeTable();
+ 		initializeMouseEvent();
+ 		System.out.println(status);
+ 		if(!status.equals("client"))
+ 			initializeMouseEvent();
+  
+  	}
+
 	/**
 	 * set selected shape notify changes on that selected shape
 	 * 
@@ -289,11 +299,7 @@ public class Canvas extends JPanel {
 		for (DShape shape : shapes) {
 			// loop through all the shapes and draw them
 			shape.draw(g);
-			// if (shape.equals(selected)) {
-			// Rectangle biggerBounds = shape.getBiggerBounds();
-			// g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width,
-			// biggerBounds.height);
-			// }
+
 		}
 
 		if (selectedKnobs != null) {
@@ -337,6 +343,23 @@ public class Canvas extends JPanel {
 		dShapeTableModel.fireTableDataChanged();
 
 	}
+
+	public void updateShape(DShapeModel update){
+ 		DShape current = getShape(update.getID());
+ 		DShapeModel currentModel = current.getdShapeModel();
+ 		currentModel.setColor(update.getColor());
+ 		currentModel.setHeight(update.getHeight());
+ 		currentModel.setWidth(update.getWidth());
+ 		currentModel.setX(update.getX());
+ 		currentModel.setY(update.getY());
+ 
+ 		if (currentModel instanceof DTextModel){
+ 			DTextModel currentTextModel = (DTextModel)currentModel;
+ 			DTextModel updateTextModel = (DTextModel)update; 
+ 			currentTextModel.setText(updateTextModel.getText());
+ 			currentTextModel.setFontName(updateTextModel.getFontName());
+ 		}
+ 	}
 	
 	public DShape getShape(int id) {
 		DShape dShape = null;
@@ -367,6 +390,15 @@ public class Canvas extends JPanel {
 			dShapeTableModel.fireTableDataChanged();
 		}
 	}
+
+	public void deleteShape(DShapeModel model){
+ 		System.out.println("hi this is running");
+ 		DShape shape = getShape(model.getID());
+ 		model.removeAllModelListeners();
+ 		shapes.remove(shape);
+ 		setSelected(null);
+ 		dShapeTableModel.fireTableDataChanged();
+ 	}
 
 	/**
 	 * if selected shape is a dtext repaint it
@@ -411,6 +443,15 @@ public class Canvas extends JPanel {
 
 	}
 
+	public void moveFront(DShapeModel model){
+ 		DShape shape = getShape(model.getID());
+ 		shapes.remove(shape);
+ 		shapes.add(shapes.size(), shape);
+ 		repaint();
+ 		dShapeTableModel.fireTableDataChanged();
+ 	}
+ 
+
 	public void moveBack(DShape selected) {
 		shapes.remove(selected);
 		shapes.add(0, selected);
@@ -418,6 +459,15 @@ public class Canvas extends JPanel {
 		dShapeTableModel.fireTableDataChanged();
 
 	}
+
+	public void moveBack(DShapeModel model){
+ 		DShape shape = getShape(model.getID());
+ 		shapes.remove(shape);
+ 		shapes.add(0, shape);
+ 		repaint();
+ 		dShapeTableModel.fireTableDataChanged();
+ 
+ 	}
 	/**
 	 * save into xml file
 	 * @param file
