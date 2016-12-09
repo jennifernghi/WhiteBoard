@@ -76,7 +76,7 @@ public abstract class DShape implements ModelListener {
 	@Override
 	public void individualChanged(DShapeModel model) {
 		// TODO Auto-generated method stub
-		//canvas.repaint();
+		
 	}
 	/**
 	 * get X from dShapeModel

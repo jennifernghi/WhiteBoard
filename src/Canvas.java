@@ -41,12 +41,10 @@ public class Canvas extends JPanel {
 	private int selectedX;
 	private int selectedY;
 
-	public Canvas(String status) {
+	public Canvas() {
 		showCanvasGUI();
 		initializeTable();
-		System.out.println(status);
-		if(!status.equals("client"))
-			initializeMouseEvent();
+		initializeMouseEvent();
 
 	}
 
@@ -289,6 +287,11 @@ public class Canvas extends JPanel {
 		for (DShape shape : shapes) {
 			// loop through all the shapes and draw them
 			shape.draw(g);
+			// if (shape.equals(selected)) {
+			// Rectangle biggerBounds = shape.getBiggerBounds();
+			// g.drawRect(biggerBounds.x, biggerBounds.y, biggerBounds.width,
+			// biggerBounds.height);
+			// }
 		}
 
 		if (selectedKnobs != null) {
@@ -318,7 +321,7 @@ public class Canvas extends JPanel {
 
 			dShape = new DText();
 		}
-		// dShapeTableModel listens to the change of the model
+		// register listener on dShapeTableModel
 		dShapeModel.addModelListener(dShapeTableModel);
 
 		// set correct dShapeModel for dShape
@@ -346,25 +349,6 @@ public class Canvas extends JPanel {
 		}
 		return dShape;
 	}
-
-	public void updateShape(DShapeModel update){
-		DShape current = getShape(update.getID());
-		DShapeModel currentModel = current.getdShapeModel();
-		currentModel.setColor(update.getColor());
-		currentModel.setHeight(update.getHeight());
-		currentModel.setWidth(update.getWidth());
-		currentModel.setX(update.getX());
-		currentModel.setY(update.getY());
-
-		if (currentModel instanceof DTextModel){
-			DTextModel currentTextModel = (DTextModel)currentModel;
-			DTextModel updateTextModel = (DTextModel)update; 
-			currentTextModel.setText(updateTextModel.getText());
-			currentTextModel.setFontName(updateTextModel.getFontName());
-		}
-	}
-	
-	//TODO handle try catch
 	public void deleteShape() {
 		if (selected != null) {
 			// TODO Remove from list, WhiteBoard listeners and dShape listeners,
@@ -380,15 +364,6 @@ public class Canvas extends JPanel {
 			setSelected(null);
 			dShapeTableModel.fireTableDataChanged();
 		}
-	}
-
-	public synchronized void deleteShape(DShapeModel model){
-		System.out.println("hi this is running");
-		DShape shape = getShape(model.getID());
-		model.removeAllModelListeners();
-		shapes.remove(shape);
-		setSelected(null);
-		dShapeTableModel.fireTableDataChanged();
 	}
 
 	/**
@@ -434,26 +409,9 @@ public class Canvas extends JPanel {
 
 	}
 
-	public void moveFront(DShapeModel model){
-		DShape shape = getShape(model.getID());
-		shapes.remove(shape);
-		shapes.add(shapes.size(), shape);
-		repaint();
-		dShapeTableModel.fireTableDataChanged();
-	}
-
 	public void moveBack(DShape selected) {
 		shapes.remove(selected);
 		shapes.add(0, selected);
-		repaint();
-		dShapeTableModel.fireTableDataChanged();
-
-	}
-
-	public void moveBack(DShapeModel model){
-		DShape shape = getShape(model.getID());
-		shapes.remove(shape);
-		shapes.add(0, shape);
 		repaint();
 		dShapeTableModel.fireTableDataChanged();
 
