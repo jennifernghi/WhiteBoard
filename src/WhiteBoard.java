@@ -46,7 +46,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	// List of object streams to which we send data
 	private List<ObjectOutputStream> outputs = new ArrayList<ObjectOutputStream>();
 	private Canvas canvas;
-	private WhiteBoard whiteBoardClient; 
+	private WhiteBoard whiteBoardClient;
 
 	private JButton serverStartButton, clientStartButton, saveButton, openButton, saveImageButton, addRectButton,
 			addOvalButton, addLineButton, addTextButton, setColorButton, moveFrontButton, moveBackButton,
@@ -61,19 +61,19 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	public WhiteBoard() {
 		this.status = NORMAL;
-		showWhiteBoardGUI();
+		showWhiteBoardGUI(10, 10);
 	}
 
-	public WhiteBoard(String status){
- 		this.status = status; 
- 		showWhiteBoardGUI();
- 	}
+	public WhiteBoard(String status) {
+		this.status = status;
+		showWhiteBoardGUI(100, 100);
+	}
 
 	public Canvas getCanvas() {
 		return this.canvas;
 	}
 
-	private void showWhiteBoardGUI() {
+	private void showWhiteBoardGUI(int x, int y) {
 		// whole whiteboard gui + canvas
 		canvas = new Canvas(status);
 
@@ -82,6 +82,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		frame.setLayout(new BorderLayout());
 		frame.add(canvas, BorderLayout.CENTER);
 		frame.add(showControlGUI(), BorderLayout.WEST);
+		frame.setLocation(x, y);
 		frame.setVisible(true);
 		frame.pack();
 	}
@@ -221,26 +222,24 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	}
 
-	
-
 	private JScrollPane showTableGUI() {
 
 		table = new JTable(canvas.getTableModel());
-		
-		
+
 		JScrollPane scrollPane = new JScrollPane(table);
-		table.getSelectionModel().addListSelectionListener(e->selectRow(table.getSelectedRow()));
+		table.getSelectionModel().addListSelectionListener(e -> selectRow(table.getSelectedRow()));
 		return scrollPane;
 	}
+
 	/*
 	 * handle row selection
 	 */
 	private void selectRow(int row) {
-		
-		if(row>=0){
+
+		if (row >= 0) {
 			canvas.selectRow(row);
 		}
-		
+
 	}
 
 	private Box showEditShapeBox() {
@@ -268,6 +267,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 		canvas.setFontName(fontName);
 	}
+
 	/**
 	 * handle setColor
 	 */
@@ -359,12 +359,13 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 * handle open
 	 */
 	private void open() {
-		String input = JOptionPane.showInputDialog("File Name: ");
-		if (input == null) {
-			// handle null pointer exception
-			return;
-		} else {
-			if (status.equals(NORMAL)) {
+
+		if (status.equals(NORMAL)) {
+			String input = JOptionPane.showInputDialog("File Name: ");
+			if (input == null) {
+				// handle null pointer exception
+				return;
+			} else {
 				file = new File(input);
 
 				if (file != null) {
@@ -377,10 +378,11 @@ public class WhiteBoard extends JFrame implements ModelListener {
 				} else {
 					return;// handle nullpointerexception
 				}
-			} else {
-				JOptionPane.showMessageDialog(this, "this feature is unavailable in " + status + " mode");
 			}
+		} else {
+			JOptionPane.showMessageDialog(this, "this feature is unavailable in " + status + " mode");
 		}
+
 	}
 
 	/**
@@ -408,13 +410,13 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 */
 	private void removeShape() {
 		if (status.equals(NORMAL) || status.equals(SERVER)) {
- 			if (canvas.getSelected()!= null){
- 			sentToClient(REMOVE, canvas.getSelected().getdShapeModel());
- 			canvas.deleteShape();
- 			}
- 		} else {
- 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
- 		}
+			if (canvas.getSelected() != null) {
+				sentToClient(REMOVE, canvas.getSelected().getdShapeModel());
+				canvas.deleteShape();
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
@@ -422,15 +424,15 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 */
 	private void moveBack() {
 		if (status.equals(NORMAL) || status.equals(SERVER)) {
- 			if (canvas.getSelected() == null) {
- 				return;
- 			} else {
- 				sentToClient(BACK, canvas.getSelected().getdShapeModel());
- 				canvas.moveBack(canvas.getSelected());
- 			}
- 		}else{
- 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
-  		}
+			if (canvas.getSelected() == null) {
+				return;
+			} else {
+				sentToClient(BACK, canvas.getSelected().getdShapeModel());
+				canvas.moveBack(canvas.getSelected());
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
@@ -438,36 +440,42 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	 */
 	private void moveFront() {
 		if (status.equals(NORMAL) || status.equals(SERVER)) {
- 			if (canvas.getSelected() == null) {
- 				return;
- 			} else {
- 				sentToClient(FRONT, canvas.getSelected().getdShapeModel());
- 				canvas.moveFront(canvas.getSelected());
- 			}
- 		}else{
- 			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
-  		}
+			if (canvas.getSelected() == null) {
+				return;
+			} else {
+				sentToClient(FRONT, canvas.getSelected().getdShapeModel());
+				canvas.moveFront(canvas.getSelected());
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Unavailable! Client is read-only!");
+		}
 	}
 
 	/**
 	 * handle client-side networking
 	 */
 	private void clientStart() {
-		if (status.equals(SERVER)&& whiteBoardClient !=null) {
+		if (status.equals(SERVER) && whiteBoardClient != null) {
 			int input = JOptionPane.showConfirmDialog(this,
 					"program is on server mode, can't switch to client. Do you want to quit?");
 			if (input == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
 
-		} else if (status.equals(CLIENT)&& whiteBoardClient !=null) {
+		} else if (status.equals(CLIENT) && whiteBoardClient != null) {
 			JOptionPane.showMessageDialog(this, "Program already connect to " + IP + ":" + PORT);
+		} else if (status.equals(NORMAL)) {
+			JOptionPane.showMessageDialog(this, "Error! Server not found. Start server first.");
 		} else {
 			String address = JOptionPane.showInputDialog("Connect to", IP + ":" + PORT);
-			System.out.println(address);
-			ClientHandler client = new ClientHandler(IP, PORT);
-			whiteBoardClient = new WhiteBoard(CLIENT);
-			client.start();
+			if (address != null) {
+				ClientHandler client = new ClientHandler(IP, PORT);
+				whiteBoardClient = new WhiteBoard(CLIENT);
+				client.start();
+			} else {
+				return;
+			}
+
 		}
 	}
 
@@ -487,12 +495,17 @@ public class WhiteBoard extends JFrame implements ModelListener {
 			JOptionPane.showMessageDialog(this, "You are already in server mode");
 		} else {
 			String port = JOptionPane.showInputDialog("Port Number:", PORT);
-			if (Integer.parseInt(port.trim()) < 0 || Integer.parseInt(port.trim()) > 65535) {
-				JOptionPane.showMessageDialog(this, "available port: 0 - 65535");
+
+			if (port != null) {
+				if (Integer.parseInt(port.trim()) < 0 || Integer.parseInt(port.trim()) > 65535) {
+					JOptionPane.showMessageDialog(this, "available port: 0 - 65535");
+				} else {
+					setStatus(SERVER);
+					ServerAccepter server = new ServerAccepter(PORT);
+					server.start();
+				}
 			} else {
-				setStatus(SERVER);
-				ServerAccepter server = new ServerAccepter(PORT);
-				server.start();
+				return;
 			}
 		}
 	}
@@ -582,28 +595,26 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 	@Override
 	public void individualChanged(DShapeModel model) {
-		
-			//if shape is selected in canvas, show corresponding selection on table
-			table.setRowSelectionInterval(canvas.getTableModel().getRowIndex(model), canvas.getTableModel().getRowIndex(model));
-			// if selected is a dtextmodel
-			if (model instanceof DTextModel) {
-				DTextModel dTextModel = (DTextModel) model;
-				enableTextControlGUI(true); // enable textField and JCombobox
 
-				// update textField and JCombobox with selected text shape' text and
-				// font name
-				setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());
+		// if shape is selected in canvas, show corresponding selection on table
+		table.setRowSelectionInterval(canvas.getTableModel().getRowIndex(model),
+				canvas.getTableModel().getRowIndex(model));
+		// if selected is a dtextmodel
+		if (model instanceof DTextModel) {
+			DTextModel dTextModel = (DTextModel) model;
+			enableTextControlGUI(true); // enable textField and JCombobox
 
-			} else {
+			// update textField and JCombobox with selected text shape' text and
+			// font name
+			setTextControlGUI(dTextModel.getText(), dTextModel.getFontName());
 
-				// disable textField & JCombobox
-				enableTextControlGUI(false);
+		} else {
 
-			}
-		
-		
-		
-		
+			// disable textField & JCombobox
+			enableTextControlGUI(false);
+
+		}
+
 	}
 
 	/**
@@ -683,18 +694,16 @@ public class WhiteBoard extends JFrame implements ModelListener {
 
 					if (command.equals(ADD)) {
 						whiteBoardClient.canvas.addShape(model);
- 					}else if (command.equals(REMOVE)){
- 						whiteBoardClient.canvas.deleteShape(model);
- 					}else if(command.equals(BACK)){
- 						whiteBoardClient.canvas.moveBack(model); 
- 					}else if (command.equals(CHANGE)){
- 						whiteBoardClient.canvas.updateShape(model);
- 
- 
- 					}else if (command.equals(FRONT)){
- 						whiteBoardClient.canvas.moveFront(model);
-  					}
-  
+					} else if (command.equals(REMOVE)) {
+						whiteBoardClient.canvas.deleteShape(model);
+					} else if (command.equals(BACK)) {
+						whiteBoardClient.canvas.moveBack(model);
+					} else if (command.equals(CHANGE)) {
+						whiteBoardClient.canvas.updateShape(model);
+
+					} else if (command.equals(FRONT)) {
+						whiteBoardClient.canvas.moveFront(model);
+					}
 
 				}
 			} catch (Exception ex) { // IOException and ClassNotFoundException
@@ -725,6 +734,5 @@ public class WhiteBoard extends JFrame implements ModelListener {
 	private synchronized void addOutput(ObjectOutputStream objectOutputStream) {
 		outputs.add(objectOutputStream);
 	}
-	
-	
+
 }
