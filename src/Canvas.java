@@ -38,21 +38,25 @@ public class Canvas extends JPanel {
 	private int indexOfMoving;
 	private int selectedX;
 	private int selectedY;
+	private boolean enable =false; 
 
 	public Canvas() {
 		showCanvasGUI();
 		initializeTable();
 		initializeMouseEvent();
+		enable = true; 
 
 	}
 
 	public Canvas(String status) {
   		showCanvasGUI();
   		initializeTable();
- 		initializeMouseEvent();
+ 		//initializeMouseEvent();
  		System.out.println(status);
- 		if(!status.equals("client"))
+ 		if(!status.equals("client")){
  			initializeMouseEvent();
+ 			enable = true; 
+ 		}
   
   	}
 
@@ -85,7 +89,6 @@ public class Canvas extends JPanel {
 	}
 
 	private void initializeMouseEvent() {
-
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -392,7 +395,7 @@ public class Canvas extends JPanel {
 	}
 
 	public void deleteShape(DShapeModel model){
- 		System.out.println("hi this is running");
+ 		//System.out.println("hi this is running");
  		DShape shape = getShape(model.getID());
  		model.removeAllModelListeners();
  		shapes.remove(shape);
@@ -536,10 +539,11 @@ public class Canvas extends JPanel {
 
 	public void selectRow(int row) {
 		// TODO Auto-generated method stub
-
+		if (enable){
 		setSelected(getShape((int)dShapeTableModel.getValueAt(row, 0)));
 		selectedKnobs= selected.getKnobs();
 		repaint();
+	}
 		
 	}
 	
