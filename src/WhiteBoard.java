@@ -462,14 +462,14 @@ public class WhiteBoard extends JFrame implements ModelListener {
 				System.exit(0);
 			}
 
-		} else if (status.equals(CLIENT) && whiteBoardClient != null) {
+		} else if (status.equals(CLIENT)) {
 			JOptionPane.showMessageDialog(this, "Program already connect to " + IP + ":" + PORT);
 		} else if (status.equals(NORMAL)) {
 			JOptionPane.showMessageDialog(this, "Error! Server not found. Start server first.");
 		} else {
 			String address = JOptionPane.showInputDialog("Connect to", IP + ":" + PORT);
 			if (address != null) {
-				setStatus(CLIENT);
+				
 				ClientHandler client = new ClientHandler(IP, PORT);
 				whiteBoardClient = new WhiteBoard(CLIENT);
 				client.start();
