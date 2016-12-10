@@ -21,10 +21,12 @@ public class DText extends DShape {
 		    //get current clip
 		    Shape clip = dText.getClip();
 		    
+		    FontMetrics fm = g.getFontMetrics(font);
+		    
 		    //intersect the clip with the text shape bound
 		    dText.setClip(clip.getBounds().createIntersection(getBounds()));
 		    //draw text
-		    dText.drawString(dTextModel.getText(), getX(), getY() + getHeight());
+		    dText.drawString(dTextModel.getText(), getX(), getX()+getHeight() - fm.getDescent());
 		    
 		    //restore old clip
 		    g.setClip(clip);
