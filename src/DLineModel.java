@@ -17,7 +17,7 @@ public class DLineModel extends DShapeModel {
 	public DLineModel() {
 		p1 = new Point();
 		p2= new Point();
-		//setAnchorPoint(p1);
+		
 	}
 	/**
 	 * set P1

@@ -17,7 +17,11 @@ public class DShapeModelTable extends AbstractTableModel implements ModelListene
 	public void setCanvas(Canvas canvas) {
 		this.canvas = canvas;
 	}
-
+	/**
+	 * given a model, get the row index of that represent that model
+	 * @param model
+	 * @return row index
+	 */
 	public int getRowIndex(DShapeModel model){
 		for(int i=0; i<canvas.getShapes().size();i++){
 			if (canvas.getShapes().get(i).getdShapeModel() == model) {

@@ -538,9 +538,12 @@ public class Canvas extends JPanel {
 		}
 
 	}
-
+	/**
+	 * select corresponding shape when user select a row
+	 * @param row
+	 */
 	public void selectRow(int row) {
-		// TODO Auto-generated method stub
+		
 		if (enable){
 		setSelected(getShape((int)dShapeTableModel.getValueAt(row, 0)));
 		selectedKnobs= selected.getKnobs();

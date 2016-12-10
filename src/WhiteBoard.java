@@ -469,7 +469,7 @@ public class WhiteBoard extends JFrame implements ModelListener {
 		} else {
 			String address = JOptionPane.showInputDialog("Connect to", IP + ":" + PORT);
 			if (address != null) {
-				
+
 				ClientHandler client = new ClientHandler(IP, PORT);
 				whiteBoardClient = new WhiteBoard(CLIENT);
 				client.start();
@@ -655,10 +655,11 @@ public class WhiteBoard extends JFrame implements ModelListener {
 					// connection)
 					addOutput(new ObjectOutputStream(toClient.getOutputStream()));
 					/**
-					 * this loop will populate shapes are already on server' canvas
+					 * this loop will populate shapes are already on server'
+					 * canvas
 					 */
-					for(DShape shape: canvas.getShapes()){
-						DShapeModel dShapeModel =  shape.getdShapeModel();
+					for (DShape shape : canvas.getShapes()) {
+						DShapeModel dShapeModel = shape.getdShapeModel();
 						sentToClient(ADD, dShapeModel);
 					}
 

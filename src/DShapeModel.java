@@ -16,11 +16,17 @@ public abstract class DShapeModel {
 		conceptualBound = new Rectangle(0, 0, 0, 0);
 		this.color = Color.GRAY;
 	}
-	
+	/**
+	 * get ID of the shape
+	 * @return id
+	 */
 	public int getID() {
 		return this.id;
 	}
-	
+	/**
+	 * set id
+	 * @param id
+	 */
 	public void setID(int id) {
 		this.id=id;
 	}
