@@ -26,7 +26,7 @@ public class DText extends DShape {
 		    //intersect the clip with the text shape bound
 		    dText.setClip(clip.getBounds().createIntersection(getBounds()));
 		    //draw text
-		    dText.drawString(dTextModel.getText(), getX(), getX()+getHeight() - fm.getDescent());
+		    dText.drawString(dTextModel.getText(), getX(), getY()+getHeight() - fm.getDescent());
 		    
 		    //restore old clip
 		    g.setClip(clip);
