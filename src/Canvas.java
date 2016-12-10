@@ -349,6 +349,7 @@ public class Canvas extends JPanel {
 
 	public void updateShape(DShapeModel update){
  		DShape current = getShape(update.getID());
+ 		if (current != null){
  		DShapeModel currentModel = current.getdShapeModel();
  		currentModel.setColor(update.getColor());
  		currentModel.setHeight(update.getHeight());
@@ -361,6 +362,7 @@ public class Canvas extends JPanel {
  			DTextModel updateTextModel = (DTextModel)update; 
  			currentTextModel.setText(updateTextModel.getText());
  			currentTextModel.setFontName(updateTextModel.getFontName());
+ 		}
  		}
  	}
 	
