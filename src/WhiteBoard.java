@@ -684,17 +684,12 @@ public class WhiteBoard extends JFrame implements ModelListener {
 			try {
 				// make connection to the server name/port
 				Socket toServer = new Socket(name, port);
-				// get input stream to READ from server and wrap in object input
-				// stream
+				// get input stream to READ from server and wrap in object input stream
 				ObjectInputStream in = new ObjectInputStream(toServer.getInputStream());
 
-				// we could do this if we wanted to write to server in addition
-				// to reading
-				// out = new ObjectOutputStream(toServer.getOutputStream());
+				
 				while (true) {
-					// Get the xml string, decode to a Message object.
-					// Blocks in readObject(), waiting for server to send
-					// something.
+					
 					String command = (String) in.readObject();
 					String dShapeModel = (String) in.readObject();
 					XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(dShapeModel.getBytes()));
